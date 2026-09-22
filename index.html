@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Prototipo funcional de Nube Académica para Proyecto Integrador II">
+  <title>Nube Académica | UNAN-León</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <section id="login-view" class="login-layout">
+    <div class="login-story">
+      <a class="brand brand-light" href="#" aria-label="Nube Académica">
+        <span class="brand-mark">NA</span>
+        <span><strong>Nube Académica</strong><small>UNAN-León</small></span>
+      </a>
+      <div class="story-copy">
+        <span class="eyebrow">Proyecto Integrador II · GT2-GP13</span>
+        <h1>Servicios académicos disponibles donde los necesites.</h1>
+        <p>Consulta información, administra registros y accede a documentos mediante una experiencia centralizada y adaptable.</p>
+        <div class="coverage-chip"><strong>64.3 %</strong><span>9 de 14 requisitos implementados</span></div>
+      </div>
+      <p class="story-foot">Prototipo demostrativo · Datos ficticios</p>
+    </div>
+
+    <div class="login-panel">
+      <form id="login-form" class="login-card" novalidate>
+        <div>
+          <span class="eyebrow blue">Acceso institucional</span>
+          <h2>Iniciar sesión</h2>
+          <p class="muted">Selecciona una cuenta de demostración o escribe sus credenciales.</p>
+        </div>
+
+        <label>Correo institucional
+          <input id="email" type="email" autocomplete="username" placeholder="usuario@unanleon.edu.ni" required>
+        </label>
+        <label>Contraseña
+          <input id="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+        </label>
+        <p id="login-error" class="form-error" role="alert" hidden></p>
+        <button class="primary-button" type="submit">Ingresar a la plataforma</button>
+
+        <div class="demo-divider"><span>Cuentas de demostración</span></div>
+        <div class="demo-grid">
+          <button type="button" class="demo-account" data-demo="student"><strong>Estudiante</strong><span>Consulta académica</span></button>
+          <button type="button" class="demo-account" data-demo="teacher"><strong>Docente</strong><span>Documentos</span></button>
+          <button type="button" class="demo-account" data-demo="admin"><strong>Administrador</strong><span>Gestión completa</span></button>
+        </div>
+        <p class="demo-password">Contraseña común: <code>Demo123!</code></p>
+      </form>
+    </div>
+  </section>
+
+  <section id="app-view" class="app-shell" hidden>
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="Nube Académica">
+        <span class="brand-mark">NA</span>
+        <span><strong>Nube Académica</strong><small>UNAN-León</small></span>
+      </a>
+
+      <div class="user-card">
+        <span id="user-initials" class="avatar">JP</span>
+        <span><strong id="user-name">Usuario</strong><small id="user-role">Rol</small></span>
+      </div>
+
+      <nav id="main-nav" aria-label="Navegación principal">
+        <button class="nav-item active" data-view="dashboard" data-roles="student,teacher,admin"><span>⌂</span>Resumen</button>
+        <button class="nav-item" data-view="academic" data-roles="student"><span>▤</span>Información académica</button>
+        <button class="nav-item" data-view="records" data-roles="admin"><span>✎</span>Registros académicos</button>
+        <button class="nav-item" data-view="documents" data-roles="student,teacher,admin"><span>▱</span>Documentos</button>
+        <button class="nav-item" data-view="search" data-roles="student,teacher,admin"><span>⌕</span>Búsqueda</button>
+        <button class="nav-item" data-view="notifications" data-roles="student,teacher,admin"><span>●</span>Notificaciones <small id="nav-notification-count" class="nav-count" hidden></small></button>
+        <button class="nav-item" data-view="reports" data-roles="admin"><span>▥</span>Reportes</button>
+        <button class="nav-item" data-view="audit" data-roles="admin"><span>◎</span>Bitácora</button>
+        <button class="nav-item" data-view="users" data-roles="admin"><span>♙</span>Usuarios y roles</button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="mini-progress"><span><strong>9/14</strong> requisitos</span><span>64.3 %</span><i><b></b></i></div>
+        <button id="logout-button" class="ghost-button" type="button">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <header class="topbar">
+        <div><span id="page-kicker" class="eyebrow blue">Panel</span><h1 id="page-title">Resumen</h1></div>
+        <div class="top-actions"><span id="top-notification" class="notification-pill" hidden></span><span class="status-dot"><i></i>Servicio disponible</span><button id="reset-button" class="small-button" type="button">Restablecer demo</button></div>
+      </header>
+
+      <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+      <section id="view-dashboard" class="view active-view">
+        <div class="welcome-banner">
+          <div><span class="eyebrow">Bienvenido</span><h2 id="welcome-title">Tu información académica, en un solo lugar</h2><p id="welcome-text">Revisa los servicios disponibles para tu rol.</p></div>
+          <div class="cloud-illustration"><span>☁</span><small>Entorno demostrativo</small></div>
+        </div>
+        <div id="dashboard-stats" class="stats-grid"></div>
+        <div class="content-grid">
+          <article class="panel">
+            <div class="panel-head"><div><span class="eyebrow blue">Actividad reciente</span><h3>Últimos movimientos</h3></div></div>
+            <ul id="activity-list" class="activity-list"></ul>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><span class="eyebrow blue">Avance</span><h3>Requisitos implementados</h3></div><strong>64.3 %</strong></div>
+            <ol class="requirement-list">
+              <li><b>RF-01</b><span>Autenticación institucional</span><em>Completo</em></li>
+              <li><b>RF-02</b><span>Roles y permisos</span><em>Completo</em></li>
+              <li><b>RF-03</b><span>Consulta académica</span><em>Completo</em></li>
+              <li><b>RF-04</b><span>Gestión de registros</span><em>Completo</em></li>
+              <li><b>RF-05</b><span>Repositorio documental</span><em>Completo</em></li>
+              <li><b>RF-06</b><span>Búsqueda y filtros</span><em>Completo</em></li>
+              <li><b>RF-07</b><span>Notificaciones internas</span><em>Completo</em></li>
+              <li><b>RF-08</b><span>Reportes y exportación CSV</span><em>Completo</em></li>
+              <li><b>RF-09</b><span>Bitácora de auditoría</span><em>Completo</em></li>
+            </ol>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-academic" class="view" hidden>
+        <div class="toolbar">
+          <label>Período académico
+            <select id="period-filter"><option value="2026-II">2026 · Segundo semestre</option><option value="2026-I">2026 · Primer semestre</option></select>
+          </label>
+          <button id="academic-print" class="secondary-button" type="button">Imprimir resumen</button>
+        </div>
+        <div class="stats-grid academic-stats">
+          <article class="stat-card"><span>Promedio</span><strong id="average-stat">88.4</strong><small>Rendimiento general</small></article>
+          <article class="stat-card"><span>Asignaturas</span><strong id="subjects-stat">5</strong><small>Período seleccionado</small></article>
+          <article class="stat-card"><span>Créditos</span><strong id="credits-stat">20</strong><small>Inscritos</small></article>
+        </div>
+        <article class="panel">
+          <div class="panel-head"><div><span class="eyebrow blue">RF-03</span><h3>Asignaturas y calificaciones</h3></div><span class="muted">Solo se muestran registros del estudiante autenticado</span></div>
+          <div class="table-wrap"><table><thead><tr><th>Código</th><th>Asignatura</th><th>Horario</th><th>Créditos</th><th>Nota</th><th>Estado</th></tr></thead><tbody id="academic-table"></tbody></table></div>
+        </article>
+      </section>
+
+      <section id="view-records" class="view" hidden>
+        <div class="toolbar">
+          <label class="search-field">Buscar registro<input id="record-search" type="search" placeholder="Código, asignatura o docente"></label>
+          <label>Período<select id="record-period"><option value="all">Todos</option><option value="2026-II">2026-II</option><option value="2026-I">2026-I</option></select></label>
+          <button id="new-record" class="primary-button compact" type="button">Nuevo registro</button>
+        </div>
+        <article class="panel">
+          <div class="panel-head"><div><span class="eyebrow blue">RF-04</span><h3>Gestión de registros académicos</h3></div><span id="record-count" class="counter"></span></div>
+          <div class="table-wrap"><table><thead><tr><th>Código</th><th>Asignatura</th><th>Docente</th><th>Período</th><th>Estado</th><th class="right">Acciones</th></tr></thead><tbody id="records-table"></tbody></table></div>
+        </article>
+      </section>
+
+      <section id="view-documents" class="view" hidden>
+        <div class="toolbar">
+          <label class="search-field">Buscar documento<input id="document-search" type="search" placeholder="Nombre, categoría o propietario"></label>
+          <label>Categoría<select id="document-category"><option value="all">Todas</option><option value="Normativa">Normativa</option><option value="Calendario">Calendario</option><option value="Formatos">Formatos</option><option value="Académico">Académico</option></select></label>
+          <button id="upload-document" class="primary-button compact" type="button">Cargar documento</button>
+        </div>
+        <article class="panel">
+          <div class="panel-head"><div><span class="eyebrow blue">RF-05</span><h3>Repositorio documental</h3></div><span id="document-count" class="counter"></span></div>
+          <div id="documents-grid" class="documents-grid"></div>
+        </article>
+      </section>
+
+
+
+      <section id="view-search" class="view" hidden>
+        <div class="toolbar">
+          <label class="search-field">Búsqueda integrada<input id="global-search" type="search" placeholder="Asignatura, documento, código, usuario..."></label>
+          <label>Tipo<select id="global-type"><option value="all">Todo</option><option value="academic">Información académica</option><option value="documents">Documentos</option><option value="records">Registros</option><option value="users">Usuarios</option></select></label>
+          <label>Período<select id="global-period"><option value="all">Todos</option><option value="2026-II">2026-II</option><option value="2026-I">2026-I</option></select></label>
+        </div>
+        <article class="panel">
+          <div class="panel-head"><div><span class="eyebrow blue">RF-06</span><h3>Resultados autorizados</h3></div><span id="global-result-count" class="counter"></span></div>
+          <div id="global-results" class="search-results"></div>
+        </article>
+      </section>
+
+      <section id="view-notifications" class="view" hidden>
+        <div class="toolbar">
+          <label>Estado<select id="notification-filter"><option value="all">Todas</option><option value="unread">No leídas</option><option value="read">Leídas</option></select></label>
+          <button id="mark-all-read" class="secondary-button" type="button">Marcar todas como leídas</button>
+        </div>
+        <article class="panel">
+          <div class="panel-head"><div><span class="eyebrow blue">RF-07</span><h3>Notificaciones internas</h3></div><span id="notification-count" class="counter"></span></div>
+          <div id="notifications-list" class="notifications-list"></div>
+        </article>
+      </section>
+
+      <section id="view-reports" class="view" hidden>
+        <div class="toolbar">
+          <label>Período<select id="report-period"><option value="all">Todos</option><option value="2026-II">2026-II</option><option value="2026-I">2026-I</option></select></label>
+          <button id="export-report" class="primary-button compact" type="button">Exportar CSV</button>
+        </div>
+        <div id="report-stats" class="stats-grid"></div>
+        <article class="panel">
+          <div class="panel-head"><div><span class="eyebrow blue">RF-08</span><h3>Detalle del reporte académico</h3></div><span id="report-count" class="counter"></span></div>
+          <div class="table-wrap"><table><thead><tr><th>Código</th><th>Asignatura</th><th>Docente</th><th>Período</th><th>Créditos</th><th>Estado</th></tr></thead><tbody id="report-table"></tbody></table></div>
+        </article>
+      </section>
+
+      <section id="view-audit" class="view" hidden>
+        <div class="toolbar">
+          <label class="search-field">Buscar evento<input id="audit-search" type="search" placeholder="Actor, acción, resultado u origen"></label>
+          <label>Resultado<select id="audit-result"><option value="all">Todos</option><option value="Correcto">Correcto</option><option value="Denegado">Denegado</option></select></label>
+        </div>
+        <article class="panel">
+          <div class="panel-head"><div><span class="eyebrow blue">RF-09</span><h3>Bitácora de auditoría</h3></div><span id="audit-count" class="counter"></span></div>
+          <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Actor</th><th>Acción</th><th>Resultado</th><th>Origen</th></tr></thead><tbody id="audit-table"></tbody></table></div>
+          <p class="audit-note">La bitácora es de solo lectura en el prototipo. Los usuarios ordinarios no tienen acceso a esta vista.</p>
+        </article>
+      </section>
+
+      <section id="view-users" class="view" hidden>
+        <div class="toolbar"><label class="search-field">Buscar usuario<input id="user-search" type="search" placeholder="Nombre o correo"></label><span class="info-note">Los cambios se guardan en este navegador.</span></div>
+        <article class="panel">
+          <div class="panel-head"><div><span class="eyebrow blue">RF-02</span><h3>Usuarios y roles</h3></div><span id="user-count" class="counter"></span></div>
+          <div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Correo</th><th>Rol asignado</th><th>Estado</th><th>Último acceso</th></tr></thead><tbody id="users-table"></tbody></table></div>
+        </article>
+      </section>
+    </main>
+  </section>
+
+  <dialog id="record-dialog">
+    <form id="record-form" method="dialog" class="dialog-card">
+      <div class="dialog-head"><div><span class="eyebrow blue">RF-04</span><h2 id="record-dialog-title">Nuevo registro</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button></div>
+      <input id="record-id" type="hidden">
+      <div class="form-grid">
+        <label>Código<input id="record-code" required maxlength="12" placeholder="ISI-501"></label>
+        <label>Período<select id="record-form-period"><option>2026-II</option><option>2026-I</option></select></label>
+        <label class="wide">Asignatura<input id="record-subject" required maxlength="80" placeholder="Nombre de la asignatura"></label>
+        <label class="wide">Docente<input id="record-teacher" required maxlength="80" placeholder="Nombre del docente"></label>
+        <label>Créditos<input id="record-credits" type="number" min="1" max="8" value="4" required></label>
+        <label>Estado<select id="record-status"><option>Publicado</option><option>Borrador</option><option>Inactivo</option></select></label>
+      </div>
+      <p id="record-error" class="form-error" role="alert" hidden></p>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Cancelar</button><button id="save-record" class="primary-button compact" value="default">Guardar registro</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="document-dialog">
+    <form id="document-form" method="dialog" class="dialog-card">
+      <div class="dialog-head"><div><span class="eyebrow blue">RF-05</span><h2>Cargar documento</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button></div>
+      <label>Archivo permitido: PDF, DOCX o XLSX (máximo 10 MB)<input id="document-file" type="file" accept=".pdf,.docx,.xlsx" required></label>
+      <label>Categoría<select id="document-form-category"><option>Académico</option><option>Normativa</option><option>Calendario</option><option>Formatos</option></select></label>
+      <p id="document-error" class="form-error" role="alert" hidden></p>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Cancelar</button><button class="primary-button compact" value="default">Guardar metadatos</button></div>
+    </form>
+  </dialog>
+
+  <script src="logic.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
