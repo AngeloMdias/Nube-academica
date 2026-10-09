@@ -1,0 +1,15 @@
+NUBE ACADÉMICA — ACTUALIZACIÓN GITHUB PAGES
+
+1. Extrae este ZIP.
+2. En el repositorio Nube-academica, reemplaza TODOS los archivos de la raíz por los de esta carpeta (index.html, script.js, logic.js, styles.css, tests y sample-files).
+3. No subas la carpeta contenedora: index.html debe quedar en la raíz del repositorio.
+4. Espera 1–2 minutos a que GitHub Pages publique.
+5. Abre el sitio y usa Ctrl+F5 una vez. Los archivos llevan ?v=6.2.1 para evitar caché antigua.
+
+PRUEBA RÁPIDA
+- Estudiante → Mis asignaturas: deben aparecer 5 asignaturas.
+- Estudiante → Actividades y entregas: NO debe aparecer “Crear actividad”; deben mostrarse actividades y estados.
+- Docente → Mis asignaturas: deben aparecer 3 asignaturas.
+- Docente → Actividades y entregas: debe aparecer “Crear actividad” y las entregas.
+- Estudiante/Docente → Agenda: NO debe aparecer respaldo ni RNF-04.
+- Administrador → Configuración: allí sí aparece respaldo/restauración.

@@ -1,4 +1,4 @@
-# Nube Académica — Prototipo funcional Ver. 6
+# Nube Académica — Prototipo funcional Ver. 6.2.1
 
 Proyecto Integrador II · grupo **GT2-GP13** · UNAN-León.
 
@@ -122,3 +122,12 @@ La interfaz de uso diario fue separada de la documentación técnica del proyect
 El respaldo y la recuperación se trasladaron a **Administrador → Configuración**, porque son funciones de gestión del sistema y no tareas propias de estudiantes o docentes.
 
 La agenda se compactó visualmente y los perfiles académicos mantienen como centro las asignaturas, actividades, entregas, calificaciones, retroalimentación, documentos y notificaciones.
+
+
+## Corrección urgente Ver. 6.2.1
+- Corrige la carga de **Mis asignaturas** y **Actividades y entregas** para estudiante y docente.
+- Reinicia los datos de flujo académico al cambiar de versión, evitando estados vacíos heredados de versiones anteriores.
+- El botón **Crear actividad** se muestra únicamente al docente.
+- **Restablecer demo** se muestra únicamente al administrador.
+- Respaldo y recuperación se mantiene exclusivamente en **Administrador → Configuración**.
+- Se añadieron parámetros de versión a CSS/JS para evitar que GitHub Pages reutilice archivos antiguos en caché.
