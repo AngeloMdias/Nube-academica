@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta name="description" content="Prototipo funcional de Nube Académica para Proyecto Integrador II">
   <title>Nube Académica | UNAN-León</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=6.2.1">
 </head>
 <body>
 <a class="skip-link" href="#app-view">Saltar al contenido</a>
@@ -87,7 +88,7 @@
     <main class="workspace">
       <header class="topbar">
         <div><span id="page-kicker" class="eyebrow blue">Panel</span><h1 id="page-title">Resumen</h1></div>
-        <div class="top-actions"><span id="top-notification" class="notification-pill" hidden></span><span class="status-dot"><i></i>Servicio disponible</span><button id="reset-button" class="small-button" type="button">Restablecer demo</button></div>
+        <div class="top-actions"><span id="top-notification" class="notification-pill" hidden></span><span class="status-dot"><i></i>Servicio disponible</span><button id="reset-button" class="small-button" type="button" data-roles="admin" hidden>Restablecer demo</button></div>
       </header>
 
       <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
@@ -95,7 +96,6 @@
       <section id="view-dashboard" class="view active-view">
         <div class="welcome-banner">
           <div><span class="eyebrow">Bienvenido</span><h2 id="welcome-title">Tu información académica, en un solo lugar</h2><p id="welcome-text">Revisa los servicios disponibles para tu rol.</p></div>
-          <div class="cloud-illustration"><span>☁</span><small>Entorno demostrativo</small></div>
         </div>
         <div id="dashboard-stats" class="stats-grid"></div>
         <div class="content-grid dashboard-content">
@@ -119,7 +119,7 @@
           <article class="stat-card"><span>Créditos</span><strong id="credits-stat">20</strong><small>Inscritos</small></article>
         </div>
         <article class="panel">
-          <div class="panel-head"><div><span class="eyebrow blue">RF-03</span><h3>Asignaturas y calificaciones</h3></div><span class="muted">Solo se muestran registros del estudiante autenticado</span></div>
+          <div class="panel-head"><div><span class="eyebrow blue">Rendimiento académico</span><h3>Asignaturas y calificaciones</h3></div><span class="muted">Solo se muestran registros del estudiante autenticado</span></div>
           <div class="table-wrap"><table><thead><tr><th>Código</th><th>Asignatura</th><th>Horario</th><th>Créditos</th><th>Nota</th><th>Estado</th></tr></thead><tbody id="academic-table"></tbody></table></div>
         </article>
       </section>
@@ -140,7 +140,7 @@
         <div class="toolbar">
           <label>Asignatura<select id="assignment-course-filter"><option value="all">Todas</option></select></label>
           <label>Estado<select id="assignment-status-filter"><option value="all">Todos</option><option value="pending">Pendientes</option><option value="submitted">Entregados</option><option value="graded">Calificados</option></select></label>
-          <button id="new-assignment" class="primary-button compact" type="button">Crear actividad</button>
+          <button id="new-assignment" class="primary-button compact" type="button" data-roles="teacher" hidden>Crear actividad</button>
         </div>
         <div id="assignment-stats" class="stats-grid"></div>
         <article class="panel">
@@ -156,7 +156,7 @@
           <button id="new-record" class="primary-button compact" type="button">Nuevo registro</button>
         </div>
         <article class="panel">
-          <div class="panel-head"><div><span class="eyebrow blue">RF-04</span><h3>Gestión de registros académicos</h3></div><span id="record-count" class="counter"></span></div>
+          <div class="panel-head"><div><span class="eyebrow blue">Administración académica</span><h3>Gestión de registros académicos</h3></div><span id="record-count" class="counter"></span></div>
           <div class="table-wrap"><table><thead><tr><th>Código</th><th>Asignatura</th><th>Docente</th><th>Período</th><th>Estado</th><th class="right">Acciones</th></tr></thead><tbody id="records-table"></tbody></table></div>
         </article>
       </section>
@@ -168,7 +168,7 @@
           <button id="upload-document" class="primary-button compact" type="button">Cargar documento</button>
         </div>
         <article class="panel">
-          <div class="panel-head"><div><span class="eyebrow blue">RF-05</span><h3>Repositorio documental</h3></div><span id="document-count" class="counter"></span></div>
+          <div class="panel-head"><div><span class="eyebrow blue">Repositorio</span><h3>Repositorio documental</h3></div><span id="document-count" class="counter"></span></div>
           <div id="documents-grid" class="documents-grid"></div>
         </article>
       </section>
@@ -192,7 +192,7 @@
           <label>Período<select id="global-period"><option value="all">Todos</option><option value="2026-II">2026-II</option><option value="2026-I">2026-I</option></select></label>
         </div>
         <article class="panel">
-          <div class="panel-head"><div><span class="eyebrow blue">RF-06</span><h3>Resultados autorizados</h3></div><span id="global-result-count" class="counter"></span></div>
+          <div class="panel-head"><div><span class="eyebrow blue">Búsqueda</span><h3>Resultados autorizados</h3></div><span id="global-result-count" class="counter"></span></div>
           <div id="global-results" class="search-results"></div>
         </article>
       </section>
@@ -203,7 +203,7 @@
           <button id="mark-all-read" class="secondary-button" type="button">Marcar todas como leídas</button>
         </div>
         <article class="panel">
-          <div class="panel-head"><div><span class="eyebrow blue">RF-07</span><h3>Notificaciones internas</h3></div><span id="notification-count" class="counter"></span></div>
+          <div class="panel-head"><div><span class="eyebrow blue">Comunicación</span><h3>Notificaciones</h3></div><span id="notification-count" class="counter"></span></div>
           <div id="notifications-list" class="notifications-list"></div>
         </article>
       </section>
@@ -215,7 +215,7 @@
         </div>
         <div id="report-stats" class="stats-grid"></div>
         <article class="panel">
-          <div class="panel-head"><div><span class="eyebrow blue">RF-08</span><h3>Detalle del reporte académico</h3></div><span id="report-count" class="counter"></span></div>
+          <div class="panel-head"><div><span class="eyebrow blue">Reportes</span><h3>Detalle del reporte académico</h3></div><span id="report-count" class="counter"></span></div>
           <div class="table-wrap"><table><thead><tr><th>Código</th><th>Asignatura</th><th>Docente</th><th>Período</th><th>Créditos</th><th>Estado</th></tr></thead><tbody id="report-table"></tbody></table></div>
         </article>
       </section>
@@ -226,7 +226,7 @@
           <label>Resultado<select id="audit-result"><option value="all">Todos</option><option value="Correcto">Correcto</option><option value="Denegado">Denegado</option></select></label>
         </div>
         <article class="panel">
-          <div class="panel-head"><div><span class="eyebrow blue">RF-09</span><h3>Bitácora de auditoría</h3></div><span id="audit-count" class="counter"></span></div>
+          <div class="panel-head"><div><span class="eyebrow blue">Auditoría</span><h3>Bitácora de eventos</h3></div><span id="audit-count" class="counter"></span></div>
           <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Actor</th><th>Acción</th><th>Resultado</th><th>Origen</th></tr></thead><tbody id="audit-table"></tbody></table></div>
           <p class="audit-note">La bitácora es de solo lectura en el prototipo. Los usuarios ordinarios no tienen acceso a esta vista.</p>
         </article>
@@ -320,7 +320,7 @@
 
   <dialog id="record-dialog">
     <form id="record-form" method="dialog" class="dialog-card">
-      <div class="dialog-head"><div><span class="eyebrow blue">RF-04</span><h2 id="record-dialog-title">Nuevo registro</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button></div>
+      <div class="dialog-head"><div><span class="eyebrow blue">Registro académico</span><h2 id="record-dialog-title">Nuevo registro</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button></div>
       <input id="record-id" type="hidden">
       <div class="form-grid">
         <label>Código<input id="record-code" required maxlength="12" placeholder="ISI-501"></label>
@@ -337,7 +337,7 @@
 
   <dialog id="document-dialog">
     <form id="document-form" method="dialog" class="dialog-card">
-      <div class="dialog-head"><div><span class="eyebrow blue">RF-05</span><h2>Cargar documento</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button></div>
+      <div class="dialog-head"><div><span class="eyebrow blue">Repositorio</span><h2>Cargar documento</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button></div>
       <label>Archivo permitido: PDF, DOCX o XLSX (máximo 10 MB)<input id="document-file" type="file" accept=".pdf,.docx,.xlsx" required></label>
       <label>Categoría<select id="document-form-category"><option>Académico</option><option>Normativa</option><option>Calendario</option><option>Formatos</option></select></label>
       <p id="document-error" class="form-error" role="alert" hidden></p>
@@ -345,7 +345,7 @@
     </form>
   </dialog>
 
-  <script src="logic.js"></script>
-  <script src="script.js"></script>
+  <script src="logic.js?v=6.2.1"></script>
+  <script src="script.js?v=6.2.1"></script>
 </body>
 </html>
