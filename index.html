@@ -75,6 +75,7 @@
         <button class="nav-item" data-view="notifications" data-roles="student,teacher,admin"><span>●</span>Notificaciones <small id="nav-notification-count" class="nav-count" hidden></small></button>
         <button class="nav-item" data-view="reports" data-roles="admin"><span>▥</span>Reportes</button>
         <button class="nav-item" data-view="audit" data-roles="admin"><span>◎</span>Bitácora</button>
+        <button class="nav-item" data-view="settings" data-roles="admin"><span>⚙</span>Configuración</button>
         <button class="nav-item" data-view="users" data-roles="admin"><span>♙</span>Usuarios y roles</button>
       </nav>
 
@@ -182,11 +183,6 @@
           <div class="panel-head"><div><span class="eyebrow blue">Utilidad académica</span><h3 id="agenda-heading">Agenda de actividades</h3></div><span id="agenda-count" class="counter"></span></div>
           <div id="agenda-list" class="agenda-list"></div>
         </article>
-        <article class="panel backup-panel">
-          <div class="panel-head"><div><span class="eyebrow blue">RNF-04</span><h3>Respaldo y recuperación local</h3></div><span class="badge">Implementado</span></div>
-          <p class="muted">Exporta una copia JSON de los datos de demostración o restaura una copia válida. Esta función permite demostrar recuperación de la información local.</p>
-          <div class="toolbar"><button id="backup-export" class="secondary-button" type="button">Exportar respaldo</button><label class="file-restore">Restaurar respaldo<input id="backup-import" type="file" accept="application/json,.json"></label></div>
-        </article>
       </section>
 
       <section id="view-search" class="view" hidden>
@@ -246,6 +242,31 @@
     </main>
   </section>
 
+
+
+      <section id="view-settings" class="view" hidden>
+        <div class="settings-grid">
+          <article class="panel">
+            <div class="panel-head">
+              <div><span class="eyebrow blue">Administración</span><h3>Respaldo y recuperación</h3></div>
+              <span class="badge success">Disponible</span>
+            </div>
+            <p class="muted">Genera una copia de seguridad de los datos del prototipo o restaura una copia válida. Esta función está reservada al perfil administrador.</p>
+            <div class="backup-actions">
+              <button id="export-backup-admin" class="primary-button" type="button">Exportar respaldo</button>
+              <label class="file-action">Restaurar respaldo<input id="restore-backup-admin" type="file" accept=".json"></label>
+            </div>
+          </article>
+          <article class="panel">
+            <div class="panel-head"><div><span class="eyebrow blue">Sistema</span><h3>Estado de la plataforma</h3></div></div>
+            <div class="system-list">
+              <div><strong>Datos locales</strong><span class="badge success">Operativos</span></div>
+              <div><strong>Notificaciones</strong><span class="badge success">Operativas</span></div>
+              <div><strong>Respaldo</strong><span class="badge success">Disponible</span></div>
+            </div>
+          </article>
+        </div>
+      </section>
 
   <dialog id="assignment-dialog">
     <form id="assignment-form" method="dialog" class="dialog-card">

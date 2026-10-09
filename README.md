@@ -1,4 +1,4 @@
-# Nube Académica — Prototipo funcional Ver. 5
+# Nube Académica — Prototipo funcional Ver. 6
 
 Proyecto Integrador II · grupo **GT2-GP13** · UNAN-León.
 
@@ -114,3 +114,11 @@ Docente publica actividad → estudiante recibe aviso → estudiante entrega →
 
 ## Interfaz y paleta
 Se mantiene la paleta azul marino, azul medio y cian de la versión anterior. Es coherente con un entorno académico/institucional, mantiene buen contraste y diferencia correctamente navegación, acciones y estados. Se priorizó mejorar la jerarquía y utilidad antes que cambiar una identidad visual que ya funcionaba.
+
+
+## Ajuste de interfaz Ver. 6
+La interfaz de uso diario fue separada de la documentación técnica del proyecto. Los porcentajes de avance, códigos RF/RNF y la matriz de cobertura ya no se muestran a estudiantes ni docentes. La cobertura del proyecto continúa documentándose aquí y en los entregables académicos.
+
+El respaldo y la recuperación se trasladaron a **Administrador → Configuración**, porque son funciones de gestión del sistema y no tareas propias de estudiantes o docentes.
+
+La agenda se compactó visualmente y los perfiles académicos mantienen como centro las asignaturas, actividades, entregas, calificaciones, retroalimentación, documentos y notificaciones.

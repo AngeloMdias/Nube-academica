@@ -77,9 +77,9 @@ const DEFAULT_AUDIT = [
 const TITLES = {
   dashboard: ["Panel", "Resumen"], academic: ["Servicios académicos", "Información académica"],
   records: ["Administración", "Registros académicos"], documents: ["Recursos", "Repositorio documental"],
-  search: ["RF-06", "Búsqueda integrada"], notifications: ["RF-07", "Notificaciones"],
+  search: ["RF-06", "Búsqueda integrada"], notifications: ["Notificaciones", "Notificaciones"],
   reports: ["RF-08", "Reportes académicos"], audit: ["RF-09", "Bitácora"],
-  users: ["Seguridad", "Usuarios y roles"], agenda: ["Organización", "Agenda académica"], courses:["Aprendizaje","Mis asignaturas"], assignments:["Aprendizaje","Actividades y entregas"]
+  users: ["Seguridad", "Usuarios y roles"], agenda: ["Organización", "Agenda académica"], courses:["Aprendizaje","Mis asignaturas"], assignments:["Aprendizaje","Actividades y entregas"], settings:["Administración","Configuración"]
 };
 const ROLE_LABELS = { student: "Estudiante", teacher: "Docente", admin: "Administrador académico" };
 
@@ -339,7 +339,23 @@ function renderAgenda() {
 function saveAgenda(event){ if(event.submitter?.value==="cancel")return; event.preventDefault(); const item={id:Date.now(),ownerRole:currentUser.role,ownerUserId:currentUser.id,title:el("agenda-title").value.trim(),subject:el("agenda-subject").value.trim(),date:el("agenda-date").value,type:el("agenda-type").value,note:el("agenda-note").value.trim(),done:false}; if(!item.title||!item.subject||!item.date)return; agenda.push(item);saveData("na_agenda",agenda);addAudit(currentUser.email,`Creación de actividad: ${item.title}`);el("agenda-dialog").close();el("agenda-form").reset();renderAgenda();renderDashboard();showToast("Actividad agregada a tu agenda.");}
 function toggleAgenda(id){const a=agenda.find(x=>x.id===id);if(!a)return;a.done=!a.done;saveData("na_agenda",agenda);addAudit(currentUser.email,`${a.done?"Completó":"Reabrió"} actividad: ${a.title}`);renderAgenda();renderDashboard();}
 function exportBackup(){const payload={format:"NubeAcademicaBackup-v1",createdAt:new Date().toISOString(),users,records,documents,notifications,audit,agenda,courses,assignments,submissions};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`nube-academica-respaldo-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);addAudit(currentUser.email,"Exportación de respaldo local");showToast("Respaldo exportado correctamente.");}
-async function importBackup(event){const file=event.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(data.format!=="NubeAcademicaBackup-v1"||![data.users,data.records,data.documents,data.notifications,data.audit,data.agenda,data.courses,data.assignments,data.submissions].every(Array.isArray))throw new Error();users=data.users;records=data.records;documents=data.documents;notifications=data.notifications;audit=data.audit;agenda=data.agenda;courses=data.courses;assignments=data.assignments;submissions=data.submissions;saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda);saveData("na_courses",courses);saveData("na_assignments",assignments);saveData("na_submissions",submissions);addAudit(currentUser.email,"Restauración de respaldo local");renderAll();showToast("Respaldo restaurado y validado.");}catch{showToast("El archivo no es un respaldo válido de Nube Académica.");}finally{event.target.value="";}}
+async function importBackup(event){const file=event.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(data.format!=="NubeAcademicaBackup-v1"||![data.users,data.records,data.documents,data.notifications,data.audit,data.agenda,data.courses,data.assignments,data.submissions].every(Array.isArray))throw new Error();users=data.users;records=data.records;documents=data.documents;notifications=data.notifications;audit=data.audit;agenda=data.agenda;courses=data.courses;assignments=data.assignments;submissions=data.submissions;saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda);saveData("na_courses",courses);saveData("na_assignments",assignments);saveData("na_submissions",submissions);addAudit(currentUser.email,"Restauración de respaldo local");
+el("export-backup-admin")?.addEventListener("click",exportBackup);
+
+async function restoreBackupAdmin(event){
+ const file=event.target.files?.[0]; if(!file)return;
+ try{
+  const data=JSON.parse(await file.text());
+  if(data.app!=="Nube Académica"||![data.users,data.records,data.documents,data.notifications,data.audit,data.agenda,data.courses,data.assignments,data.submissions].every(Array.isArray)) throw new Error("invalid");
+  users=data.users;records=data.records;documents=data.documents;notifications=data.notifications;audit=data.audit;agenda=data.agenda;courses=data.courses;assignments=data.assignments;submissions=data.submissions;
+  saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda);saveData("na_courses",courses);saveData("na_assignments",assignments);saveData("na_submissions",submissions);
+  addAudit(currentUser.email,"Restauró respaldo del sistema");renderAll();showToast("Respaldo restaurado correctamente.");
+ }catch{showToast("El archivo de respaldo no es válido.");}
+ event.target.value="";
+}
+el("restore-backup-admin")?.addEventListener("change",restoreBackupAdmin);
+
+renderAll();showToast("Respaldo restaurado y validado.");}catch{showToast("El archivo no es un respaldo válido de Nube Académica.");}finally{event.target.value="";}}
 
 
 function myCourses(){ return currentUser.role==="teacher" ? courses.filter(c=>c.teacherId===currentUser.id) : courses.filter(c=>c.studentIds.includes(currentUser.id)); }
