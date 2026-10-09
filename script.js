@@ -1,5 +1,5 @@
 const U = window.NAUtils;
-const PROTOTYPE_VERSION = "80-real-11-de-14";
+const PROTOTYPE_VERSION = "6.2.1-academic-workflow";
 
 const DEMO_USERS = [
   { id: 1, name: "José Ángel Pineda", email: "estudiante@unanleon.edu.ni", password: "Demo123!", role: "student", active: true, last: "Hoy, 09:42" },
@@ -68,39 +68,47 @@ const DEFAULT_AGENDA = [
 ];
 
 const DEFAULT_AUDIT = [
-  { id: 801, date: "22/09/2026 10:07", actor: "admin@unanleon.edu.ni", action: "Consulta de bitácora", result: "Correcto", origin: "Navegador demo" },
-  { id: 802, date: "22/09/2026 10:05", actor: "admin@unanleon.edu.ni", action: "Generación de reporte", result: "Correcto", origin: "Navegador demo" },
-  { id: 803, date: "22/09/2026 09:42", actor: "estudiante@unanleon.edu.ni", action: "Consulta académica 2026-II", result: "Correcto", origin: "Navegador demo" },
-  { id: 804, date: "22/09/2026 09:21", actor: "desconocido@unanleon.edu.ni", action: "Intento de inicio de sesión", result: "Denegado", origin: "Navegador demo" }
+  { id: 801, date: "22/09/2026 10:07", actor: "admin@unanleon.edu.ni", action: "Consulta de bitácora", result: "Correcto", origin: "Navegador web" },
+  { id: 802, date: "22/09/2026 10:05", actor: "admin@unanleon.edu.ni", action: "Generación de reporte", result: "Correcto", origin: "Navegador web" },
+  { id: 803, date: "22/09/2026 09:42", actor: "estudiante@unanleon.edu.ni", action: "Consulta académica 2026-II", result: "Correcto", origin: "Navegador web" },
+  { id: 804, date: "22/09/2026 09:21", actor: "desconocido@unanleon.edu.ni", action: "Intento de inicio de sesión", result: "Denegado", origin: "Navegador web" }
 ];
 
 const TITLES = {
-  dashboard: ["Panel", "Resumen"], academic: ["Servicios académicos", "Información académica"],
-  records: ["Administración", "Registros académicos"], documents: ["Recursos", "Repositorio documental"],
-  search: ["RF-06", "Búsqueda integrada"], notifications: ["Notificaciones", "Notificaciones"],
-  reports: ["RF-08", "Reportes académicos"], audit: ["RF-09", "Bitácora"],
-  users: ["Seguridad", "Usuarios y roles"], agenda: ["Organización", "Agenda académica"], courses:["Aprendizaje","Mis asignaturas"], assignments:["Aprendizaje","Actividades y entregas"], settings:["Administración","Configuración"]
+  dashboard:["Panel","Resumen"], academic:["Servicios académicos","Información académica"],
+  records:["Administración","Registros académicos"], documents:["Recursos","Repositorio documental"],
+  search:["Explorar","Búsqueda integrada"], notifications:["Comunicación","Notificaciones"],
+  reports:["Administración","Reportes académicos"], audit:["Seguridad","Bitácora"],
+  users:["Seguridad","Usuarios y roles"], agenda:["Organización","Agenda académica"],
+  courses:["Aprendizaje","Mis asignaturas"], assignments:["Aprendizaje","Actividades y entregas"],
+  settings:["Administración","Configuración"]
 };
 const ROLE_LABELS = { student: "Estudiante", teacher: "Docente", admin: "Administrador académico" };
 
 if (localStorage.getItem("na_version") !== PROTOTYPE_VERSION) {
-  ["na_users", "na_records", "na_documents", "na_notifications", "na_audit", "na_agenda"].forEach(k => localStorage.removeItem(k));
+  ["na_users","na_records","na_documents","na_notifications","na_audit","na_agenda","na_courses","na_assignments","na_submissions"].forEach(k => localStorage.removeItem(k));
   localStorage.setItem("na_version", PROTOTYPE_VERSION);
 }
 
 
 const DEFAULT_COURSES = [
+  {id:"ISI-501", name:"Proyecto Integrador II", teacherId:2, teacher:"María López", studentIds:[1,4], period:"2026-II", schedule:"Vie · 13:00", room:"Aula 12"},
   {id:"ISI-503", name:"Patrones de Diseño", teacherId:2, teacher:"María López", studentIds:[1,4], period:"2026-II", schedule:"Mar y Jue · 10:00", room:"Lab. 3"},
-  {id:"ISI-501", name:"Proyecto Integrador II", teacherId:2, teacher:"María López", studentIds:[1], period:"2026-II", schedule:"Vie · 13:00", room:"Aula 12"},
+  {id:"ISI-505", name:"Administración de Redes", teacherId:6, teacher:"Carlos Duarte", studentIds:[1,4], period:"2026-II", schedule:"Mié · 13:00", room:"Lab. Redes"},
+  {id:"ISI-507", name:"Auditoría de Sistemas", teacherId:7, teacher:"Lucía Gómez", studentIds:[1,4], period:"2026-II", schedule:"Jue · 08:00", room:"Aula 8"},
   {id:"ISI-509", name:"Aplicaciones Web", teacherId:2, teacher:"María López", studentIds:[1,4], period:"2026-II", schedule:"Lun y Mié · 08:00", room:"Lab. 2"}
 ];
 const DEFAULT_ASSIGNMENTS = [
   {id:1001,courseId:"ISI-503",title:"Informe: Patrón Decorador",type:"Tarea",due:"2026-10-12",points:100,description:"Entregar informe breve con ejemplo aplicado.",publishedBy:2},
   {id:1002,courseId:"ISI-501",title:"Avance del artículo científico",type:"Proyecto",due:"2026-10-15",points:100,description:"Revisar metodología, resultados, discusión y referencias.",publishedBy:2},
-  {id:1003,courseId:"ISI-509",title:"Práctica de interfaz responsive",type:"Práctica",due:"2026-10-18",points:100,description:"Construir una vista adaptable para móvil y escritorio.",publishedBy:2}
+  {id:1003,courseId:"ISI-509",title:"Práctica de interfaz responsive",type:"Práctica",due:"2026-10-18",points:100,description:"Construir una vista adaptable para móvil y escritorio.",publishedBy:2},
+  {id:1004,courseId:"ISI-505",title:"Diagnóstico de red local",type:"Práctica",due:"2026-10-20",points:100,description:"Documentar topología, direccionamiento y pruebas de conectividad.",publishedBy:6},
+  {id:1005,courseId:"ISI-507",title:"Lista de verificación de auditoría",type:"Tarea",due:"2026-10-22",points:100,description:"Preparar controles, evidencias y observaciones del caso asignado.",publishedBy:7}
 ];
 const DEFAULT_SUBMISSIONS = [
-  {id:2001,assignmentId:1001,studentId:4,fileName:"decorador_ana.pdf",comment:"Adjunto mi informe.",submittedAt:"08/10/2026 18:30",grade:null,feedback:""}
+  {id:2001,assignmentId:1001,studentId:4,fileName:"decorador_ana.pdf",comment:"Adjunto mi informe.",submittedAt:"08/10/2026 18:30",grade:null,feedback:""},
+  {id:2002,assignmentId:1001,studentId:1,fileName:"patron_decorador_jose.pdf",comment:"Entrega final.",submittedAt:"08/10/2026 19:05",grade:92,feedback:"Buen ejemplo y explicación clara."},
+  {id:2003,assignmentId:1002,studentId:1,fileName:"articulo_avance_jose.docx",comment:"Versión revisada.",submittedAt:"08/10/2026 20:10",grade:null,feedback:""}
 ];
 
 let currentUser = null;
@@ -125,7 +133,7 @@ function initials(name) { return name.split(" ").slice(0,2).map(x => x[0]).join(
 function showToast(message) { const t = el("toast"); t.textContent = message; t.hidden = false; clearTimeout(showToast.timer); showToast.timer = setTimeout(() => t.hidden = true, 2600); }
 function nowLabel() { return new Date().toLocaleString("es-NI", { dateStyle: "short", timeStyle: "short" }); }
 
-function addAudit(actor, action, result = "Correcto", origin = "Navegador demo") {
+function addAudit(actor, action, result = "Correcto", origin = "Navegador web") {
   audit.unshift({ id: Date.now(), date: nowLabel(), actor: actor || "Identidad no reconocida", action, result, origin });
   audit = audit.slice(0, 120);
   saveData("na_audit", audit);
@@ -156,8 +164,9 @@ function configureSession() {
   el("user-name").textContent = currentUser.name;
   el("user-role").textContent = ROLE_LABELS[currentUser.role];
   el("user-initials").textContent = initials(currentUser.name);
-  document.querySelectorAll(".nav-item").forEach(btn => {
-    btn.hidden = !btn.dataset.roles.split(",").includes(currentUser.role);
+  document.querySelectorAll("[data-roles]").forEach(node => {
+    const roles=(node.dataset.roles||"").split(",");
+    node.hidden=!roles.includes(currentUser.role);
   });
   showView("dashboard");
   renderAll();
@@ -338,25 +347,23 @@ function renderAgenda() {
 }
 function saveAgenda(event){ if(event.submitter?.value==="cancel")return; event.preventDefault(); const item={id:Date.now(),ownerRole:currentUser.role,ownerUserId:currentUser.id,title:el("agenda-title").value.trim(),subject:el("agenda-subject").value.trim(),date:el("agenda-date").value,type:el("agenda-type").value,note:el("agenda-note").value.trim(),done:false}; if(!item.title||!item.subject||!item.date)return; agenda.push(item);saveData("na_agenda",agenda);addAudit(currentUser.email,`Creación de actividad: ${item.title}`);el("agenda-dialog").close();el("agenda-form").reset();renderAgenda();renderDashboard();showToast("Actividad agregada a tu agenda.");}
 function toggleAgenda(id){const a=agenda.find(x=>x.id===id);if(!a)return;a.done=!a.done;saveData("na_agenda",agenda);addAudit(currentUser.email,`${a.done?"Completó":"Reabrió"} actividad: ${a.title}`);renderAgenda();renderDashboard();}
-function exportBackup(){const payload={format:"NubeAcademicaBackup-v1",createdAt:new Date().toISOString(),users,records,documents,notifications,audit,agenda,courses,assignments,submissions};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`nube-academica-respaldo-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);addAudit(currentUser.email,"Exportación de respaldo local");showToast("Respaldo exportado correctamente.");}
-async function importBackup(event){const file=event.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(data.format!=="NubeAcademicaBackup-v1"||![data.users,data.records,data.documents,data.notifications,data.audit,data.agenda,data.courses,data.assignments,data.submissions].every(Array.isArray))throw new Error();users=data.users;records=data.records;documents=data.documents;notifications=data.notifications;audit=data.audit;agenda=data.agenda;courses=data.courses;assignments=data.assignments;submissions=data.submissions;saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda);saveData("na_courses",courses);saveData("na_assignments",assignments);saveData("na_submissions",submissions);addAudit(currentUser.email,"Restauración de respaldo local");
-el("export-backup-admin")?.addEventListener("click",exportBackup);
-
-async function restoreBackupAdmin(event){
- const file=event.target.files?.[0]; if(!file)return;
- try{
-  const data=JSON.parse(await file.text());
-  if(data.app!=="Nube Académica"||![data.users,data.records,data.documents,data.notifications,data.audit,data.agenda,data.courses,data.assignments,data.submissions].every(Array.isArray)) throw new Error("invalid");
-  users=data.users;records=data.records;documents=data.documents;notifications=data.notifications;audit=data.audit;agenda=data.agenda;courses=data.courses;assignments=data.assignments;submissions=data.submissions;
-  saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda);saveData("na_courses",courses);saveData("na_assignments",assignments);saveData("na_submissions",submissions);
-  addAudit(currentUser.email,"Restauró respaldo del sistema");renderAll();showToast("Respaldo restaurado correctamente.");
- }catch{showToast("El archivo de respaldo no es válido.");}
- event.target.value="";
+function exportBackup(){
+  const payload={format:"NubeAcademicaBackup-v2",createdAt:new Date().toISOString(),users,records,documents,notifications,audit,agenda,courses,assignments,submissions};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`nube-academica-respaldo-${new Date().toISOString().slice(0,10)}.json`; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000); addAudit(currentUser.email,"Exportación de respaldo local"); showToast("Respaldo exportado correctamente.");
 }
-el("restore-backup-admin")?.addEventListener("change",restoreBackupAdmin);
-
-renderAll();showToast("Respaldo restaurado y validado.");}catch{showToast("El archivo no es un respaldo válido de Nube Académica.");}finally{event.target.value="";}}
-
+async function importBackup(event){
+  const file=event.target.files?.[0]; if(!file)return;
+  try{
+    const data=JSON.parse(await file.text());
+    if(!["NubeAcademicaBackup-v1","NubeAcademicaBackup-v2"].includes(data.format)||![data.users,data.records,data.documents,data.notifications,data.audit,data.agenda,data.courses,data.assignments,data.submissions].every(Array.isArray)) throw new Error();
+    users=data.users; records=data.records; documents=data.documents; notifications=data.notifications; audit=data.audit; agenda=data.agenda; courses=data.courses; assignments=data.assignments; submissions=data.submissions;
+    saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda);saveData("na_courses",courses);saveData("na_assignments",assignments);saveData("na_submissions",submissions);
+    addAudit(currentUser.email,"Restauración de respaldo local"); renderAll(); showToast("Respaldo restaurado y validado.");
+  }catch{ showToast("El archivo no es un respaldo válido de Nube Académica."); }
+  finally{ event.target.value=""; }
+}
 
 function myCourses(){ return currentUser.role==="teacher" ? courses.filter(c=>c.teacherId===currentUser.id) : courses.filter(c=>c.studentIds.includes(currentUser.id)); }
 function courseById(id){ return courses.find(c=>c.id===id); }
@@ -499,16 +506,16 @@ document.addEventListener("click", event => {
 el("login-form").addEventListener("submit", e=>{e.preventDefault();login(el("email").value,el("password").value);});
 el("logout-button").addEventListener("click",()=>{if(currentUser)addAudit(currentUser.email,"Cierre de sesión");currentUser=null;el("app-view").hidden=true;el("login-view").hidden=false;el("login-form").reset();});
 el("reset-button").addEventListener("click",resetDemo);
-el("period-filter").addEventListener("change",()=>{renderAcademic();addAudit(currentUser.email,`Consulta académica ${el("period-filter").value}`);}); el("academic-print").addEventListener("click",()=>window.print());
-el("record-search").addEventListener("input",renderRecords); el("record-period").addEventListener("change",renderRecords); el("new-record").addEventListener("click",()=>openRecord()); el("record-form").addEventListener("submit",saveRecord);
-el("document-search").addEventListener("input",renderDocuments); el("document-category").addEventListener("change",renderDocuments); el("upload-document").addEventListener("click",()=>{el("document-error").hidden=true;el("document-dialog").showModal();}); el("document-form").addEventListener("submit",saveDocument);
-el("global-search").addEventListener("input",renderGlobalSearch); el("global-type").addEventListener("change",renderGlobalSearch); el("global-period").addEventListener("change",renderGlobalSearch);
-el("assignment-course-filter").addEventListener("change",renderAssignments); el("assignment-status-filter").addEventListener("change",renderAssignments); el("new-assignment").addEventListener("click",()=>{populateAssignmentCourses();el("assignment-dialog").showModal();}); el("assignment-form").addEventListener("submit",saveAssignment); el("submission-form").addEventListener("submit",saveSubmission); el("grade-form").addEventListener("submit",saveGrade);
-el("agenda-filter").addEventListener("change",renderAgenda); el("new-agenda-item").addEventListener("click",()=>el("agenda-dialog").showModal()); el("agenda-form").addEventListener("submit",saveAgenda); el("backup-export").addEventListener("click",exportBackup); el("backup-import").addEventListener("change",importBackup);
-el("notification-filter").addEventListener("change",renderNotifications); el("mark-all-read").addEventListener("click",markAllNotifications);
-el("report-period").addEventListener("change",renderReports); el("export-report").addEventListener("click",exportReport);
-el("audit-search").addEventListener("input",renderAudit); el("audit-result").addEventListener("change",renderAudit);
-el("user-search").addEventListener("input",renderUsers); el("users-table").addEventListener("change",e=>{if(e.target.matches("[data-user-role]"))updateUser(Number(e.target.dataset.userRole),"role",e.target.value);if(e.target.matches("[data-user-active]"))updateUser(Number(e.target.dataset.userActive),"active",e.target.checked);});
+el("period-filter")?.addEventListener("change",()=>{renderAcademic();addAudit(currentUser.email,`Consulta académica ${el("period-filter").value}`);}); el("academic-print")?.addEventListener("click",()=>window.print());
+el("record-search")?.addEventListener("input",renderRecords); el("record-period")?.addEventListener("change",renderRecords); el("new-record")?.addEventListener("click",()=>openRecord()); el("record-form")?.addEventListener("submit",saveRecord);
+el("document-search")?.addEventListener("input",renderDocuments); el("document-category")?.addEventListener("change",renderDocuments); el("upload-document")?.addEventListener("click",()=>{el("document-error").hidden=true;el("document-dialog").showModal();}); el("document-form")?.addEventListener("submit",saveDocument);
+el("global-search")?.addEventListener("input",renderGlobalSearch); el("global-type")?.addEventListener("change",renderGlobalSearch); el("global-period")?.addEventListener("change",renderGlobalSearch);
+el("assignment-course-filter")?.addEventListener("change",renderAssignments); el("assignment-status-filter")?.addEventListener("change",renderAssignments); el("new-assignment")?.addEventListener("click",()=>{populateAssignmentCourses();el("assignment-dialog").showModal();}); el("assignment-form")?.addEventListener("submit",saveAssignment); el("submission-form")?.addEventListener("submit",saveSubmission); el("grade-form")?.addEventListener("submit",saveGrade);
+el("agenda-filter")?.addEventListener("change",renderAgenda); el("new-agenda-item")?.addEventListener("click",()=>el("agenda-dialog").showModal()); el("agenda-form")?.addEventListener("submit",saveAgenda); el("export-backup-admin")?.addEventListener("click",exportBackup); el("restore-backup-admin")?.addEventListener("change",importBackup);
+el("notification-filter")?.addEventListener("change",renderNotifications); el("mark-all-read")?.addEventListener("click",markAllNotifications);
+el("report-period")?.addEventListener("change",renderReports); el("export-report")?.addEventListener("click",exportReport);
+el("audit-search")?.addEventListener("input",renderAudit); el("audit-result")?.addEventListener("change",renderAudit);
+el("user-search")?.addEventListener("input",renderUsers); el("users-table")?.addEventListener("change",e=>{if(e.target.matches("[data-user-role]"))updateUser(Number(e.target.dataset.userRole),"role",e.target.value);if(e.target.matches("[data-user-active]"))updateUser(Number(e.target.dataset.userActive),"active",e.target.checked);});
 
 const params=new URLSearchParams(location.search); const demo=params.get("demo"); const requestedView=params.get("view");
 if(demo){ const map={student:"estudiante@unanleon.edu.ni",teacher:"docente@unanleon.edu.ni",admin:"admin@unanleon.edu.ni",student2:"ana.castillo@unanleon.edu.ni"}; const account=users.find(u=>u.email===map[demo]); if(account){login(account.email,"Demo123!");if(requestedView)setTimeout(()=>showView(requestedView),30);} }

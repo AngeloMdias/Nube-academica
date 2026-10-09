@@ -293,3 +293,11 @@ dialog::backdrop { background: rgba(8,25,44,.62); backdrop-filter: blur(3px); }
 .system-list{display:grid;gap:10px}
 .system-list>div{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:10px 0}
 @media(max-width:800px){.settings-grid{grid-template-columns:1fr}}
+
+/* Ver. 6.2.1 — correcciones de flujo y visibilidad */
+[hidden]{display:none!important}
+#view-courses .panel,#view-assignments .panel{min-height:0}
+.course-grid:empty,.assignment-list:empty{display:none}
+.agenda-card{grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 16px!important}
+.agenda-card small{display:block;margin-top:4px}
+@media(max-width:720px){.agenda-card{grid-template-columns:1fr}.agenda-card .table-button{justify-self:start}}
