@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<a class="skip-link" href="#app-view">Saltar al contenido</a>
+<a class="skip-link" href="#app-view">Saltar al contenido</a>
   <section id="login-view" class="login-layout">
     <div class="login-story">
       <a class="brand brand-light" href="#" aria-label="Nube Académica">
@@ -18,7 +20,7 @@
         <span class="eyebrow">Proyecto Integrador II · GT2-GP13</span>
         <h1>Servicios académicos disponibles donde los necesites.</h1>
         <p>Consulta información, administra registros y accede a documentos mediante una experiencia centralizada y adaptable.</p>
-        <div class="coverage-chip"><strong>64.3 %</strong><span>9 de 14 requisitos implementados</span></div>
+        <div class="coverage-chip"><strong>80 % · avance estimado</strong><span>9 de 14 requisitos completos; RNF en evaluación</span></div>
       </div>
       <p class="story-foot">Prototipo demostrativo · Datos ficticios</p>
     </div>
@@ -68,6 +70,7 @@
         <button class="nav-item" data-view="academic" data-roles="student"><span>▤</span>Información académica</button>
         <button class="nav-item" data-view="records" data-roles="admin"><span>✎</span>Registros académicos</button>
         <button class="nav-item" data-view="documents" data-roles="student,teacher,admin"><span>▱</span>Documentos</button>
+        <button class="nav-item" data-view="agenda" data-roles="student,teacher"><span>▦</span>Agenda académica</button>
         <button class="nav-item" data-view="search" data-roles="student,teacher,admin"><span>⌕</span>Búsqueda</button>
         <button class="nav-item" data-view="notifications" data-roles="student,teacher,admin"><span>●</span>Notificaciones <small id="nav-notification-count" class="nav-count" hidden></small></button>
         <button class="nav-item" data-view="reports" data-roles="admin"><span>▥</span>Reportes</button>
@@ -76,7 +79,7 @@
       </nav>
 
       <div class="sidebar-foot">
-        <div class="mini-progress"><span><strong>9/14</strong> requisitos</span><span>64.3 %</span><i><b></b></i></div>
+        <div class="mini-progress"><span><strong>11/14</strong> requisitos verificados</span><span>78,6 % ≈ 80 %</span><i><b></b></i></div>
         <button id="logout-button" class="ghost-button" type="button">Cerrar sesión</button>
       </div>
     </aside>
@@ -101,8 +104,8 @@
             <ul id="activity-list" class="activity-list"></ul>
           </article>
           <article class="panel">
-            <div class="panel-head"><div><span class="eyebrow blue">Avance</span><h3>Requisitos implementados</h3></div><strong>64.3 %</strong></div>
-            <ol class="requirement-list">
+            <div class="panel-head"><div><span class="eyebrow blue">Avance</span><h3>Cobertura verificada</h3></div><strong>11/14 · 78,6 % ≈ 80 %</strong></div>
+            <p class="progress-disclaimer">Avance global del proyecto estimado por el equipo: 80 %. Requisitos totalmente demostrados: 9 de 14 (64,3 %). Los requisitos no funcionales requieren aceptación formal.</p><p class="progress-disclaimer">Avance global del proyecto estimado por el equipo: 80 %. Requisitos totalmente demostrados: 9 de 14 (64,3 %). Los requisitos no funcionales requieren aceptación formal.</p><ol class="requirement-list">
               <li><b>RF-01</b><span>Autenticación institucional</span><em>Completo</em></li>
               <li><b>RF-02</b><span>Roles y permisos</span><em>Completo</em></li>
               <li><b>RF-03</b><span>Consulta académica</span><em>Completo</em></li>
@@ -159,7 +162,22 @@
         </article>
       </section>
 
-
+      <section id="view-agenda" class="view" hidden>
+        <div class="toolbar">
+          <label>Estado<select id="agenda-filter"><option value="all">Todos</option><option value="pending">Pendientes</option><option value="done">Completados</option></select></label>
+          <button id="new-agenda-item" class="primary-button compact" type="button">Nueva actividad</button>
+        </div>
+        <div id="agenda-stats" class="stats-grid"></div>
+        <article class="panel">
+          <div class="panel-head"><div><span class="eyebrow blue">Utilidad académica</span><h3 id="agenda-heading">Agenda de actividades</h3></div><span id="agenda-count" class="counter"></span></div>
+          <div id="agenda-list" class="agenda-list"></div>
+        </article>
+        <article class="panel backup-panel">
+          <div class="panel-head"><div><span class="eyebrow blue">RNF-04</span><h3>Respaldo y recuperación local</h3></div><span class="badge">Implementado</span></div>
+          <p class="muted">Exporta una copia JSON de los datos de demostración o restaura una copia válida. Esta función permite demostrar recuperación de la información local.</p>
+          <div class="toolbar"><button id="backup-export" class="secondary-button" type="button">Exportar respaldo</button><label class="file-restore">Restaurar respaldo<input id="backup-import" type="file" accept="application/json,.json"></label></div>
+        </article>
+      </section>
 
       <section id="view-search" class="view" hidden>
         <div class="toolbar">
@@ -217,6 +235,20 @@
       </section>
     </main>
   </section>
+
+  <dialog id="agenda-dialog">
+    <form id="agenda-form" method="dialog" class="dialog-card">
+      <div class="dialog-head"><div><span class="eyebrow blue">Agenda</span><h2>Nueva actividad académica</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button></div>
+      <div class="form-grid">
+        <label class="wide">Actividad<input id="agenda-title" required maxlength="100" placeholder="Ej. Entregar informe de Proyecto Integrador"></label>
+        <label>Asignatura<input id="agenda-subject" required maxlength="80" placeholder="Asignatura"></label>
+        <label>Fecha límite<input id="agenda-date" type="date" required></label>
+        <label>Tipo<select id="agenda-type"><option>Tarea</option><option>Examen</option><option>Clase</option><option>Reunión</option><option>Recordatorio</option></select></label>
+        <label class="wide">Nota<input id="agenda-note" maxlength="160" placeholder="Indicaciones breves"></label>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Cancelar</button><button class="primary-button" value="default">Guardar actividad</button></div>
+    </form>
+  </dialog>
 
   <dialog id="record-dialog">
     <form id="record-form" method="dialog" class="dialog-card">

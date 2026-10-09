@@ -1,8 +1,8 @@
-# Nube Académica — Prototipo funcional Ver. 3 (64.3 %)
+# Nube Académica — Prototipo funcional Ver. 4 (avance global estimado 80 %)
 
 Proyecto Integrador II · grupo **GT2-GP13** · UNAN-León.
 
-Esta versión implementa **9 de 14 requisitos (64.3 %)** y corresponde a la meta del 60 % de la semana 7.
+**Avance global declarado por el equipo: 80 % (estimado).** La cobertura de requisitos íntegramente comprobados sigue siendo **9/14 = 64,3 %**. El 80 % no se presenta como número de requisitos aceptados: 11/14 = 78,6 % y 12/14 = 85,7 %. Esta entrega añade mejoras parciales de accesibilidad y diseño adaptable (RNF-05), todavía sin validación formal.
 
 ## Requisitos implementados
 
@@ -58,3 +58,18 @@ La entrega incluye 10 pruebas de lógica para cobertura, separación de estudian
 ## Publicar en GitHub Pages
 
 Sube a la raíz del repositorio `index.html`, `styles.css`, `logic.js`, `script.js`, `README.md` y la carpeta `sample-files/`. GitHub Pages puede alojar esta demostración estática; una autenticación institucional, API o base compartida requiere servicios de servidor adicionales.
+
+## Estado de entrega actual
+- Aplicación: avance global **80 % estimado** por el equipo; 9/14 requisitos completos verificados.
+- Artículo: **100 % de secciones de la rúbrica redactadas**; revisión editorial y ORCID de coautores pendientes.
+- Nuevas mejoras: navegación por teclado, enlace de salto, tablas desplazables y movimiento reducido.
+
+## Estado de entrega actual
+- Aplicación: avance global **80 % estimado** por el equipo; 9/14 requisitos completos verificados.
+- Artículo: **100 % de secciones de la rúbrica redactadas**; revisión editorial y ORCID de coautores pendientes.
+- Nuevas mejoras: navegación por teclado, enlace de salto, tablas desplazables y movimiento reducido.
+
+## Utilidad para estudiantes y docentes
+- **Estudiantes:** agenda personal de tareas, exámenes y recordatorios; consulta de calificaciones, horarios, documentos y avisos.
+- **Docentes:** planificación de actividades, recordatorios de publicación/revisión, carga documental y notificaciones.
+- **Continuidad:** respaldo y restauración de los datos locales de demostración.

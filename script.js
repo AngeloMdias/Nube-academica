@@ -1,5 +1,5 @@
 const U = window.NAUtils;
-const PROTOTYPE_VERSION = "64.3";
+const PROTOTYPE_VERSION = "80-real-11-de-14";
 
 const DEMO_USERS = [
   { id: 1, name: "José Ángel Pineda", email: "estudiante@unanleon.edu.ni", password: "Demo123!", role: "student", active: true, last: "Hoy, 09:42" },
@@ -59,6 +59,14 @@ const DEFAULT_NOTIFICATIONS = [
   { id: 706, eventKey: "student-4-calendar", recipientUserId: 4, subject: "Calendario académico actualizado", body: "Ya está disponible el calendario del segundo semestre 2026.", date: "22/09/2026 09:15", linkView: "documents", read: false }
 ];
 
+
+const DEFAULT_AGENDA = [
+  {id:901, ownerRole:"student", ownerUserId:1, title:"Entregar avance del artículo", subject:"Proyecto Integrador II", date:"2026-10-09", type:"Tarea", note:"Revisar rúbrica y referencias", done:false},
+  {id:902, ownerRole:"student", ownerUserId:1, title:"Repasar patrones estructurales", subject:"Patrones de Diseño", date:"2026-10-12", type:"Examen", note:"Decorador y Flyweight", done:false},
+  {id:903, ownerRole:"teacher", ownerUserId:2, title:"Publicar guía de práctica", subject:"Patrones de Diseño", date:"2026-10-10", type:"Recordatorio", note:"Subir material al repositorio", done:false},
+  {id:904, ownerRole:"teacher", ownerUserId:2, title:"Revisar entregas del grupo", subject:"Patrones de Diseño", date:"2026-10-13", type:"Tarea", note:"Registrar observaciones", done:false}
+];
+
 const DEFAULT_AUDIT = [
   { id: 801, date: "22/09/2026 10:07", actor: "admin@unanleon.edu.ni", action: "Consulta de bitácora", result: "Correcto", origin: "Navegador demo" },
   { id: 802, date: "22/09/2026 10:05", actor: "admin@unanleon.edu.ni", action: "Generación de reporte", result: "Correcto", origin: "Navegador demo" },
@@ -71,12 +79,12 @@ const TITLES = {
   records: ["Administración", "Registros académicos"], documents: ["Recursos", "Repositorio documental"],
   search: ["RF-06", "Búsqueda integrada"], notifications: ["RF-07", "Notificaciones"],
   reports: ["RF-08", "Reportes académicos"], audit: ["RF-09", "Bitácora"],
-  users: ["Seguridad", "Usuarios y roles"]
+  users: ["Seguridad", "Usuarios y roles"], agenda: ["Organización", "Agenda académica"]
 };
 const ROLE_LABELS = { student: "Estudiante", teacher: "Docente", admin: "Administrador académico" };
 
 if (localStorage.getItem("na_version") !== PROTOTYPE_VERSION) {
-  ["na_users", "na_records", "na_documents", "na_notifications", "na_audit"].forEach(k => localStorage.removeItem(k));
+  ["na_users", "na_records", "na_documents", "na_notifications", "na_audit", "na_agenda"].forEach(k => localStorage.removeItem(k));
   localStorage.setItem("na_version", PROTOTYPE_VERSION);
 }
 
@@ -86,6 +94,7 @@ let records = loadData("na_records", DEFAULT_RECORDS);
 let documents = loadData("na_documents", DEFAULT_DOCUMENTS);
 let notifications = loadData("na_notifications", DEFAULT_NOTIFICATIONS);
 let audit = loadData("na_audit", DEFAULT_AUDIT);
+let agenda = loadData("na_agenda", DEFAULT_AGENDA);
 
 function loadData(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) || structuredClone(fallback); }
@@ -148,6 +157,7 @@ function showView(view) {
   const title = TITLES[view] || ["Panel", "Nube Académica"];
   el("page-kicker").textContent = title[0]; el("page-title").textContent = title[1];
   if (view === "academic") { renderAcademic(); addAudit(currentUser.email, `Consulta académica ${el("period-filter").value}`); }
+  if (view === "agenda") renderAgenda();
   if (view === "search") renderGlobalSearch();
   if (view === "notifications") renderNotifications();
   if (view === "reports") { renderReports(); addAudit(currentUser.email, "Consulta de reportes"); }
@@ -158,7 +168,7 @@ function renderAll() {
   renderDashboard();
   if (currentUser.role === "student") renderAcademic();
   if (currentUser.role === "admin") { renderRecords(); renderUsers(); renderReports(); renderAudit(); }
-  renderDocuments(); renderGlobalSearch(); renderNotifications(); updateNotificationBadge();
+  renderDocuments(); if (["student","teacher"].includes(currentUser.role)) renderAgenda(); renderGlobalSearch(); renderNotifications(); updateNotificationBadge();
 }
 
 function renderDashboard() {
@@ -170,7 +180,7 @@ function renderDashboard() {
     el("welcome-title").textContent = "Tu información académica, en un solo lugar";
     el("welcome-text").textContent = "Consulta tus datos separados por identidad, documentos y notificaciones.";
   } else if (currentUser.role === "teacher") {
-    stats.push(["Documentos", documents.length, "Repositorio"], ["Avisos sin leer", unreadNotifications(), "RF-07"], ["Formatos", documents.filter(d=>d.category==="Formatos").length, "Disponibles"], ["Cobertura", "9/14", "64.3 %"]);
+    stats.push(["Documentos", documents.length, "Repositorio"], ["Avisos sin leer", unreadNotifications(), "RF-07"], ["Formatos", documents.filter(d=>d.category==="Formatos").length, "Disponibles"], ["Cobertura", "11/14", "78,6 % ≈ 80 %"]);
     el("welcome-title").textContent = "Recursos académicos para el trabajo docente";
     el("welcome-text").textContent = "Carga documentos autorizados, localízalos y revisa tus avisos.";
   } else {
@@ -291,6 +301,24 @@ function renderNotifications() {
 function markNotification(id) { notifications=U.markNotificationRead(notifications,id,currentUser.id); saveData("na_notifications",notifications); renderNotifications(); }
 function markAllNotifications() { notifications=U.markAllNotificationsRead(notifications,currentUser.id); saveData("na_notifications",notifications); renderNotifications(); showToast("Tus notificaciones fueron marcadas como leídas."); }
 
+function agendaVisible() {
+  const filter=el("agenda-filter")?.value||"all";
+  return agenda.filter(a => (a.ownerUserId===currentUser.id || a.ownerRole===currentUser.role) && (filter==="all" || (filter==="done"?a.done:!a.done))).sort((a,b)=>a.date.localeCompare(b.date));
+}
+function renderAgenda() {
+  if(!currentUser || !["student","teacher"].includes(currentUser.role)) return;
+  const rows=agendaVisible(), all=agenda.filter(a=>a.ownerUserId===currentUser.id || a.ownerRole===currentUser.role);
+  const pending=all.filter(a=>!a.done).length, done=all.filter(a=>a.done).length;
+  el("agenda-heading").textContent=currentUser.role==="teacher"?"Planificación y seguimiento docente":"Tareas, evaluaciones y recordatorios";
+  el("agenda-count").textContent=`${rows.length} actividades`;
+  el("agenda-stats").innerHTML=[["Pendientes",pending,"Por atender"],["Completadas",done,"Seguimiento"],["Próxima fecha",rows.find(a=>!a.done)?.date||"—","Agenda personal"]].map(x=>`<article class="stat-card"><span>${x[0]}</span><strong>${x[1]}</strong><small>${x[2]}</small></article>`).join("");
+  el("agenda-list").innerHTML=rows.length?rows.map(a=>`<article class="agenda-card ${a.done?"done":""}"><div><span class="badge">${escapeHtml(a.type)}</span><h4>${escapeHtml(a.title)}</h4><p><strong>${escapeHtml(a.subject)}</strong> · ${escapeHtml(a.date)}</p><small>${escapeHtml(a.note||"Sin nota adicional")}</small></div><button class="table-button" data-agenda-toggle="${a.id}">${a.done?"Reabrir":"Completar"}</button></article>`).join(""):`<p class="muted">No hay actividades con este filtro.</p>`;
+}
+function saveAgenda(event){ if(event.submitter?.value==="cancel")return; event.preventDefault(); const item={id:Date.now(),ownerRole:currentUser.role,ownerUserId:currentUser.id,title:el("agenda-title").value.trim(),subject:el("agenda-subject").value.trim(),date:el("agenda-date").value,type:el("agenda-type").value,note:el("agenda-note").value.trim(),done:false}; if(!item.title||!item.subject||!item.date)return; agenda.push(item);saveData("na_agenda",agenda);addAudit(currentUser.email,`Creación de actividad: ${item.title}`);el("agenda-dialog").close();el("agenda-form").reset();renderAgenda();renderDashboard();showToast("Actividad agregada a tu agenda.");}
+function toggleAgenda(id){const a=agenda.find(x=>x.id===id);if(!a)return;a.done=!a.done;saveData("na_agenda",agenda);addAudit(currentUser.email,`${a.done?"Completó":"Reabrió"} actividad: ${a.title}`);renderAgenda();renderDashboard();}
+function exportBackup(){const payload={format:"NubeAcademicaBackup-v1",createdAt:new Date().toISOString(),users,records,documents,notifications,audit,agenda};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`nube-academica-respaldo-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);addAudit(currentUser.email,"Exportación de respaldo local");showToast("Respaldo exportado correctamente.");}
+async function importBackup(event){const file=event.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(data.format!=="NubeAcademicaBackup-v1"||![data.users,data.records,data.documents,data.notifications,data.audit,data.agenda].every(Array.isArray))throw new Error();users=data.users;records=data.records;documents=data.documents;notifications=data.notifications;audit=data.audit;agenda=data.agenda;saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda);addAudit(currentUser.email,"Restauración de respaldo local");renderAll();showToast("Respaldo restaurado y validado.");}catch{showToast("El archivo no es un respaldo válido de Nube Académica.");}finally{event.target.value="";}}
+
 function renderReports() {
   if (!currentUser || currentUser.role !== "admin") return;
   const report = U.buildReport(records, el("report-period").value);
@@ -321,8 +349,8 @@ function updateUser(id,key,value) { const u=users.find(x=>x.id===id); if(!u)retu
 
 async function resetDemo() {
   if(!confirm("¿Restablecer todos los datos de demostración?"))return;
-  users=structuredClone(DEMO_USERS); records=structuredClone(DEFAULT_RECORDS); documents=structuredClone(DEFAULT_DOCUMENTS); notifications=structuredClone(DEFAULT_NOTIFICATIONS); audit=structuredClone(DEFAULT_AUDIT);
-  saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit); await clearBlobs().catch(()=>{});
+  users=structuredClone(DEMO_USERS); records=structuredClone(DEFAULT_RECORDS); documents=structuredClone(DEFAULT_DOCUMENTS); notifications=structuredClone(DEFAULT_NOTIFICATIONS); audit=structuredClone(DEFAULT_AUDIT); agenda=structuredClone(DEFAULT_AGENDA);
+  saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda); await clearBlobs().catch(()=>{});
   currentUser=users.find(u=>u.email===currentUser.email)||users[2]; configureSession(); showToast("Datos de demostración restablecidos.");
 }
 
@@ -334,6 +362,7 @@ document.addEventListener("click", event => {
   const download=event.target.closest("[data-download]"); if(download) downloadDocument(Number(download.dataset.download));
   const read=event.target.closest("[data-notification-read]"); if(read) markNotification(Number(read.dataset.notificationRead));
   const open=event.target.closest("[data-notification-open]"); if(open){ markNotification(Number(open.dataset.notificationOpen)); showView(open.dataset.viewTarget); }
+  const ag=event.target.closest("[data-agenda-toggle]"); if(ag) toggleAgenda(Number(ag.dataset.agendaToggle));
 });
 
 el("login-form").addEventListener("submit", e=>{e.preventDefault();login(el("email").value,el("password").value);});
@@ -343,6 +372,7 @@ el("period-filter").addEventListener("change",()=>{renderAcademic();addAudit(cur
 el("record-search").addEventListener("input",renderRecords); el("record-period").addEventListener("change",renderRecords); el("new-record").addEventListener("click",()=>openRecord()); el("record-form").addEventListener("submit",saveRecord);
 el("document-search").addEventListener("input",renderDocuments); el("document-category").addEventListener("change",renderDocuments); el("upload-document").addEventListener("click",()=>{el("document-error").hidden=true;el("document-dialog").showModal();}); el("document-form").addEventListener("submit",saveDocument);
 el("global-search").addEventListener("input",renderGlobalSearch); el("global-type").addEventListener("change",renderGlobalSearch); el("global-period").addEventListener("change",renderGlobalSearch);
+el("agenda-filter").addEventListener("change",renderAgenda); el("new-agenda-item").addEventListener("click",()=>el("agenda-dialog").showModal()); el("agenda-form").addEventListener("submit",saveAgenda); el("backup-export").addEventListener("click",exportBackup); el("backup-import").addEventListener("change",importBackup);
 el("notification-filter").addEventListener("change",renderNotifications); el("mark-all-read").addEventListener("click",markAllNotifications);
 el("report-period").addEventListener("change",renderReports); el("export-report").addEventListener("click",exportReport);
 el("audit-search").addEventListener("input",renderAudit); el("audit-result").addEventListener("change",renderAudit);
