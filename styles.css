@@ -301,3 +301,12 @@ dialog::backdrop { background: rgba(8,25,44,.62); backdrop-filter: blur(3px); }
 .agenda-card{grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 16px!important}
 .agenda-card small{display:block;margin-top:4px}
 @media(max-width:720px){.agenda-card{grid-template-columns:1fr}.agenda-card .table-button{justify-self:start}}
+
+/* Ver. 6.3 — agenda diferenciada por rol */
+.agenda-dialog-card{max-width:560px}
+.dialog-help{margin:-2px 0 14px;color:var(--muted);font-size:13px;line-height:1.5}
+.agenda-form-grid{grid-template-columns:1fr 1fr}
+.agenda-form-grid label[hidden]{display:none!important}
+@media(max-width:620px){
+  .agenda-form-grid{grid-template-columns:1fr}
+}

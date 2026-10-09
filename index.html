@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta name="description" content="Prototipo funcional de Nube Académica para Proyecto Integrador II">
   <title>Nube Académica | UNAN-León</title>
-  <link rel="stylesheet" href="styles.css?v=6.2.1">
+  <link rel="stylesheet" href="styles.css?v=6.3.0">
 </head>
 <body>
 <a class="skip-link" href="#app-view">Saltar al contenido</a>
@@ -176,7 +176,7 @@
       <section id="view-agenda" class="view" hidden>
         <div class="toolbar">
           <label>Estado<select id="agenda-filter"><option value="all">Todos</option><option value="pending">Pendientes</option><option value="done">Completados</option></select></label>
-          <button id="new-agenda-item" class="primary-button compact" type="button">Nueva actividad</button>
+          <button id="new-agenda-item" class="primary-button compact" type="button">Nuevo recordatorio</button>
         </div>
         <div id="agenda-stats" class="stats-grid"></div>
         <article class="panel">
@@ -305,16 +305,33 @@
   </dialog>
 
   <dialog id="agenda-dialog">
-    <form id="agenda-form" method="dialog" class="dialog-card">
-      <div class="dialog-head"><div><span class="eyebrow blue">Agenda</span><h2>Nueva actividad académica</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button></div>
-      <div class="form-grid">
-        <label class="wide">Actividad<input id="agenda-title" required maxlength="100" placeholder="Ej. Entregar informe de Proyecto Integrador"></label>
-        <label>Asignatura<input id="agenda-subject" required maxlength="80" placeholder="Asignatura"></label>
-        <label>Fecha límite<input id="agenda-date" type="date" required></label>
-        <label>Tipo<select id="agenda-type"><option>Tarea</option><option>Examen</option><option>Clase</option><option>Reunión</option><option>Recordatorio</option></select></label>
-        <label class="wide">Nota<input id="agenda-note" maxlength="160" placeholder="Indicaciones breves"></label>
+    <form id="agenda-form" method="dialog" class="dialog-card agenda-dialog-card">
+      <div class="dialog-head">
+        <div><span class="eyebrow blue" id="agenda-dialog-eyebrow">Agenda personal</span><h2 id="agenda-dialog-title">Nuevo recordatorio</h2></div>
+        <button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button>
       </div>
-      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Cancelar</button><button class="primary-button" value="default">Guardar actividad</button></div>
+      <p id="agenda-dialog-help" class="dialog-help">Crea un recordatorio privado que solo aparece en tu agenda.</p>
+      <div class="form-grid agenda-form-grid">
+        <label class="wide" id="agenda-title-field">Recordatorio
+          <input id="agenda-title" required maxlength="100" placeholder="Ej. Repasar para el examen">
+        </label>
+        <label id="agenda-subject-field">Asignatura
+          <input id="agenda-subject" maxlength="80" placeholder="Ej. Patrones de Diseño">
+        </label>
+        <label id="agenda-date-field">Fecha
+          <input id="agenda-date" type="date" required>
+        </label>
+        <label id="agenda-type-field">Tipo
+          <select id="agenda-type"></select>
+        </label>
+        <label class="wide" id="agenda-note-field">Nota opcional
+          <input id="agenda-note" maxlength="160" placeholder="Algo que quieras recordar">
+        </label>
+      </div>
+      <div class="dialog-actions">
+        <button class="secondary-button" value="cancel" formnovalidate>Cancelar</button>
+        <button id="agenda-save-button" class="primary-button" value="default">Guardar recordatorio</button>
+      </div>
     </form>
   </dialog>
 
@@ -345,7 +362,7 @@
     </form>
   </dialog>
 
-  <script src="logic.js?v=6.2.1"></script>
-  <script src="script.js?v=6.2.1"></script>
+  <script src="logic.js?v=6.3.0"></script>
+  <script src="script.js?v=6.3.0"></script>
 </body>
 </html>

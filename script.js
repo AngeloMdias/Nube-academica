@@ -1,5 +1,5 @@
 const U = window.NAUtils;
-const PROTOTYPE_VERSION = "6.2.1-academic-workflow";
+const PROTOTYPE_VERSION = "6.3.0-academic-workflow";
 
 const DEMO_USERS = [
   { id: 1, name: "José Ángel Pineda", email: "estudiante@unanleon.edu.ni", password: "Demo123!", role: "student", active: true, last: "Hoy, 09:42" },
@@ -336,16 +336,101 @@ function agendaVisible() {
   const filter=el("agenda-filter")?.value||"all";
   return agenda.filter(a => (a.ownerUserId===currentUser.id || a.ownerRole===currentUser.role) && (filter==="all" || (filter==="done"?a.done:!a.done))).sort((a,b)=>a.date.localeCompare(b.date));
 }
+function configureAgendaDialog() {
+  if(!currentUser || !["student","teacher"].includes(currentUser.role)) return;
+  const student=currentUser.role==="student";
+  el("agenda-form").reset();
+
+  el("agenda-dialog-eyebrow").textContent=student?"Agenda personal":"Planificación docente";
+  el("agenda-dialog-title").textContent=student?"Nuevo recordatorio":"Nueva planificación";
+  el("agenda-dialog-help").textContent=student
+    ?"Este recordatorio es privado y solo aparece en tu agenda. No crea tareas para una asignatura."
+    :"Agrega una nota de planificación personal. Las tareas oficiales para estudiantes se crean en “Actividades y entregas”.";
+
+  el("agenda-title-field").childNodes[0].textContent=student?"Recordatorio":"Actividad de planificación";
+  el("agenda-title").placeholder=student?"Ej. Repasar para el examen":"Ej. Preparar material de la próxima clase";
+
+  el("agenda-subject-field").hidden=student;
+  el("agenda-subject").required=!student;
+  el("agenda-subject").value="";
+
+  el("agenda-date-field").childNodes[0].textContent="Fecha";
+  el("agenda-note-field").childNodes[0].textContent=student?"Nota opcional":"Nota";
+  el("agenda-note").placeholder=student?"Ej. Revisar capítulos 3 y 4":"Ej. Llevar ejemplos y material de apoyo";
+
+  el("agenda-type").innerHTML=student
+    ? '<option>Estudio</option><option>Examen</option><option>Reunión</option><option>Recordatorio</option>'
+    : '<option>Clase</option><option>Reunión</option><option>Seguimiento</option><option>Recordatorio</option>';
+
+  el("agenda-save-button").textContent=student?"Guardar recordatorio":"Guardar planificación";
+  el("new-agenda-item").textContent=student?"Nuevo recordatorio":"Nueva planificación";
+}
+
+function openAgendaDialog(){
+  configureAgendaDialog();
+  el("agenda-dialog").showModal();
+}
+
 function renderAgenda() {
   if(!currentUser || !["student","teacher"].includes(currentUser.role)) return;
+  const student=currentUser.role==="student";
   const rows=agendaVisible(), all=agenda.filter(a=>a.ownerUserId===currentUser.id || a.ownerRole===currentUser.role);
   const pending=all.filter(a=>!a.done).length, done=all.filter(a=>a.done).length;
-  el("agenda-heading").textContent=currentUser.role==="teacher"?"Planificación y seguimiento docente":"Tareas, evaluaciones y recordatorios";
-  el("agenda-count").textContent=`${rows.length} actividades`;
-  el("agenda-stats").innerHTML=[["Pendientes",pending,"Por atender"],["Completadas",done,"Seguimiento"],["Próxima fecha",rows.find(a=>!a.done)?.date||"—","Agenda personal"]].map(x=>`<article class="stat-card"><span>${x[0]}</span><strong>${x[1]}</strong><small>${x[2]}</small></article>`).join("");
-  el("agenda-list").innerHTML=rows.length?rows.map(a=>`<article class="agenda-card ${a.done?"done":""}"><div><span class="badge">${escapeHtml(a.type)}</span><h4>${escapeHtml(a.title)}</h4><p><strong>${escapeHtml(a.subject)}</strong> · ${escapeHtml(a.date)}</p><small>${escapeHtml(a.note||"Sin nota adicional")}</small></div><button class="table-button" data-agenda-toggle="${a.id}">${a.done?"Reabrir":"Completar"}</button></article>`).join(""):`<p class="muted">No hay actividades con este filtro.</p>`;
+
+  el("new-agenda-item").textContent=student?"Nuevo recordatorio":"Nueva planificación";
+  el("agenda-heading").textContent=student?"Recordatorios personales":"Planificación personal docente";
+  el("agenda-count").textContent=`${rows.length} ${student?"recordatorios":"elementos"}`;
+
+  el("agenda-stats").innerHTML=[
+    ["Pendientes",pending,student?"Por recordar":"Por atender"],
+    ["Completadas",done,"Seguimiento"],
+    ["Próxima fecha",rows.find(a=>!a.done)?.date||"—",student?"Agenda personal":"Planificación"]
+  ].map(x=>`<article class="stat-card"><span>${x[0]}</span><strong>${x[1]}</strong><small>${x[2]}</small></article>`).join("");
+
+  el("agenda-list").innerHTML=rows.length?rows.map(a=>{
+    const meta=student
+      ? `<p>${escapeHtml(a.date)}</p>`
+      : `<p><strong>${escapeHtml(a.subject||"Planificación")}</strong> · ${escapeHtml(a.date)}</p>`;
+    return `<article class="agenda-card ${a.done?"done":""}">
+      <div>
+        <span class="badge">${escapeHtml(a.type)}</span>
+        <h4>${escapeHtml(a.title)}</h4>
+        ${meta}
+        ${a.note?`<small>${escapeHtml(a.note)}</small>`:""}
+      </div>
+      <button class="table-button" data-agenda-toggle="${a.id}">${a.done?"Reabrir":"Completar"}</button>
+    </article>`;
+  }).join(""):`<p class="muted">${student?"No tienes recordatorios con este filtro.":"No tienes elementos de planificación con este filtro."}</p>`;
 }
-function saveAgenda(event){ if(event.submitter?.value==="cancel")return; event.preventDefault(); const item={id:Date.now(),ownerRole:currentUser.role,ownerUserId:currentUser.id,title:el("agenda-title").value.trim(),subject:el("agenda-subject").value.trim(),date:el("agenda-date").value,type:el("agenda-type").value,note:el("agenda-note").value.trim(),done:false}; if(!item.title||!item.subject||!item.date)return; agenda.push(item);saveData("na_agenda",agenda);addAudit(currentUser.email,`Creación de actividad: ${item.title}`);el("agenda-dialog").close();el("agenda-form").reset();renderAgenda();renderDashboard();showToast("Actividad agregada a tu agenda.");}
+
+function saveAgenda(event){
+  if(event.submitter?.value==="cancel")return;
+  event.preventDefault();
+
+  const student=currentUser.role==="student";
+  const item={
+    id:Date.now(),
+    ownerRole:currentUser.role,
+    ownerUserId:currentUser.id,
+    title:el("agenda-title").value.trim(),
+    subject:student?"Personal":el("agenda-subject").value.trim(),
+    date:el("agenda-date").value,
+    type:el("agenda-type").value,
+    note:el("agenda-note").value.trim(),
+    done:false
+  };
+
+  if(!item.title||!item.date||(!student&&!item.subject))return;
+
+  agenda.push(item);
+  saveData("na_agenda",agenda);
+  addAudit(currentUser.email,`${student?"Creó recordatorio personal":"Creó planificación docente"}: ${item.title}`);
+  el("agenda-dialog").close();
+  el("agenda-form").reset();
+  renderAgenda();
+  renderDashboard();
+  showToast(student?"Recordatorio guardado en tu agenda personal.":"Planificación guardada en tu agenda.");
+}
 function toggleAgenda(id){const a=agenda.find(x=>x.id===id);if(!a)return;a.done=!a.done;saveData("na_agenda",agenda);addAudit(currentUser.email,`${a.done?"Completó":"Reabrió"} actividad: ${a.title}`);renderAgenda();renderDashboard();}
 function exportBackup(){
   const payload={format:"NubeAcademicaBackup-v2",createdAt:new Date().toISOString(),users,records,documents,notifications,audit,agenda,courses,assignments,submissions};
@@ -511,7 +596,7 @@ el("record-search")?.addEventListener("input",renderRecords); el("record-period"
 el("document-search")?.addEventListener("input",renderDocuments); el("document-category")?.addEventListener("change",renderDocuments); el("upload-document")?.addEventListener("click",()=>{el("document-error").hidden=true;el("document-dialog").showModal();}); el("document-form")?.addEventListener("submit",saveDocument);
 el("global-search")?.addEventListener("input",renderGlobalSearch); el("global-type")?.addEventListener("change",renderGlobalSearch); el("global-period")?.addEventListener("change",renderGlobalSearch);
 el("assignment-course-filter")?.addEventListener("change",renderAssignments); el("assignment-status-filter")?.addEventListener("change",renderAssignments); el("new-assignment")?.addEventListener("click",()=>{populateAssignmentCourses();el("assignment-dialog").showModal();}); el("assignment-form")?.addEventListener("submit",saveAssignment); el("submission-form")?.addEventListener("submit",saveSubmission); el("grade-form")?.addEventListener("submit",saveGrade);
-el("agenda-filter")?.addEventListener("change",renderAgenda); el("new-agenda-item")?.addEventListener("click",()=>el("agenda-dialog").showModal()); el("agenda-form")?.addEventListener("submit",saveAgenda); el("export-backup-admin")?.addEventListener("click",exportBackup); el("restore-backup-admin")?.addEventListener("change",importBackup);
+el("agenda-filter")?.addEventListener("change",renderAgenda); el("new-agenda-item")?.addEventListener("click",openAgendaDialog); el("agenda-form")?.addEventListener("submit",saveAgenda); el("export-backup-admin")?.addEventListener("click",exportBackup); el("restore-backup-admin")?.addEventListener("change",importBackup);
 el("notification-filter")?.addEventListener("change",renderNotifications); el("mark-all-read")?.addEventListener("click",markAllNotifications);
 el("report-period")?.addEventListener("change",renderReports); el("export-report")?.addEventListener("click",exportReport);
 el("audit-search")?.addEventListener("input",renderAudit); el("audit-result")?.addEventListener("change",renderAudit);

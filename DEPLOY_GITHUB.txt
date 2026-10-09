@@ -13,3 +13,10 @@ PRUEBA RÁPIDA
 - Docente → Actividades y entregas: debe aparecer “Crear actividad” y las entregas.
 - Estudiante/Docente → Agenda: NO debe aparecer respaldo ni RNF-04.
 - Administrador → Configuración: allí sí aparece respaldo/restauración.
+
+
+VER. 6.3
+Después de subir los archivos, verifica:
+- Estudiante > Agenda: botón "Nuevo recordatorio" y formulario simple, sin campo Asignatura.
+- Docente > Agenda: botón "Nueva planificación".
+- Las tareas oficiales se crean únicamente en Docente > Actividades y entregas.

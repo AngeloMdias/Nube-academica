@@ -1,4 +1,4 @@
-# Nube Académica — Prototipo funcional Ver. 6.2.1
+# Nube Académica — Prototipo funcional Ver. 6.3
 
 Proyecto Integrador II · grupo **GT2-GP13** · UNAN-León.
 
@@ -131,3 +131,11 @@ La agenda se compactó visualmente y los perfiles académicos mantienen como cen
 - **Restablecer demo** se muestra únicamente al administrador.
 - Respaldo y recuperación se mantiene exclusivamente en **Administrador → Configuración**.
 - Se añadieron parámetros de versión a CSS/JS para evitar que GitHub Pages reutilice archivos antiguos en caché.
+
+
+## Ajuste de Agenda — Ver. 6.3
+La Agenda ahora diferencia claramente los roles:
+
+- **Estudiante:** crea únicamente recordatorios personales privados. El formulario se redujo a título, fecha, tipo y nota opcional. No puede crear tareas oficiales ni seleccionar una asignatura como si publicara actividades.
+- **Docente:** la Agenda se usa solo para planificación personal del docente. Las actividades oficiales para estudiantes se crean exclusivamente desde **Actividades y entregas**.
+- El flujo de tareas, entregas, calificación y retroalimentación permanece separado de la Agenda.
