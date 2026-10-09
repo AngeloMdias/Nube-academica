@@ -260,3 +260,23 @@ dialog::backdrop { background: rgba(8,25,44,.62); backdrop-filter: blur(3px); }
 /* Utilidad académica + RNF-04/RNF-05 */
 .agenda-list{display:grid;gap:12px}.agenda-card{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:16px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}.agenda-card h4{margin:8px 0 4px}.agenda-card p{margin:0 0 4px}.agenda-card.done{opacity:.68}.agenda-card.done h4{text-decoration:line-through}.backup-panel{margin-top:18px}.file-restore{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);font-weight:700;cursor:pointer}.file-restore input{max-width:220px}
 @media(max-width:680px){.agenda-card{align-items:flex-start;flex-direction:column}.agenda-card button{width:100%}.file-restore{width:100%;flex-direction:column;align-items:flex-start}}
+
+/* Ver. 5 — experiencia académica estudiante/docente. Se conserva la paleta institucional existente. */
+.dashboard-content{grid-template-columns:1fr}
+.course-grid{display:grid;grid-template-columns:repeat(2,minmax(260px,1fr));gap:14px}
+.course-card{border:1px solid var(--line);border-radius:15px;background:var(--surface);padding:18px;display:grid;gap:13px}
+.course-card-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.course-code{font-size:11px;font-weight:800;color:var(--blue);letter-spacing:.05em}
+.course-card h4{margin:4px 0 0;font-size:17px;color:var(--navy)}
+.course-meta{display:flex;flex-wrap:wrap;gap:8px;color:var(--muted);font-size:11px}
+.course-actions{display:flex;gap:8px;flex-wrap:wrap}
+.assignment-list{display:grid;gap:12px}
+.assignment-card{border:1px solid var(--line);border-radius:15px;padding:17px;background:#fff;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
+.assignment-card h4{margin:6px 0 5px;color:var(--navy)}
+.assignment-card p{margin:0 0 6px;color:#40516a;font-size:13px;line-height:1.45}
+.assignment-card small{color:var(--muted)}
+.assignment-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.status-pending{background:#fff5df;color:#8a5a00}.status-submitted{background:var(--blue-soft);color:var(--blue)}.status-graded{background:var(--success-soft);color:var(--success)}
+.feedback-box{margin-top:10px;padding:10px 12px;border-radius:10px;background:#f6f9fc;border-left:3px solid var(--cyan);font-size:12px;color:#40516a}
+.quick-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+@media(max-width:800px){.course-grid{grid-template-columns:1fr}.assignment-card{grid-template-columns:1fr}.assignment-actions{justify-content:flex-start}}

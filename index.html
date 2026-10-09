@@ -19,7 +19,6 @@
         <span class="eyebrow">Proyecto Integrador II · GT2-GP13</span>
         <h1>Servicios académicos disponibles donde los necesites.</h1>
         <p>Consulta información, administra registros y accede a documentos mediante una experiencia centralizada y adaptable.</p>
-        <div class="coverage-chip"><strong>80 % de requisitos implementados</strong><span>11 de 14 requisitos · 78,6 % ≈ 80 %</span></div>
       </div>
       <p class="story-foot">Prototipo demostrativo · Datos ficticios</p>
     </div>
@@ -43,8 +42,8 @@
 
         <div class="demo-divider"><span>Cuentas de demostración</span></div>
         <div class="demo-grid">
-          <button type="button" class="demo-account" data-demo="student"><strong>Estudiante</strong><span>Consulta académica</span></button>
-          <button type="button" class="demo-account" data-demo="teacher"><strong>Docente</strong><span>Documentos</span></button>
+          <button type="button" class="demo-account" data-demo="student"><strong>Estudiante</strong><span>Clases y entregas</span></button>
+          <button type="button" class="demo-account" data-demo="teacher"><strong>Docente</strong><span>Cursos y evaluación</span></button>
           <button type="button" class="demo-account" data-demo="admin"><strong>Administrador</strong><span>Gestión completa</span></button>
         </div>
         <p class="demo-password">Contraseña común: <code>Demo123!</code></p>
@@ -67,6 +66,8 @@
       <nav id="main-nav" aria-label="Navegación principal">
         <button class="nav-item active" data-view="dashboard" data-roles="student,teacher,admin"><span>⌂</span>Resumen</button>
         <button class="nav-item" data-view="academic" data-roles="student"><span>▤</span>Información académica</button>
+        <button class="nav-item" data-view="courses" data-roles="student,teacher"><span>▦</span>Mis asignaturas</button>
+        <button class="nav-item" data-view="assignments" data-roles="student,teacher"><span>✓</span>Actividades y entregas</button>
         <button class="nav-item" data-view="records" data-roles="admin"><span>✎</span>Registros académicos</button>
         <button class="nav-item" data-view="documents" data-roles="student,teacher,admin"><span>▱</span>Documentos</button>
         <button class="nav-item" data-view="agenda" data-roles="student,teacher"><span>▦</span>Agenda académica</button>
@@ -78,7 +79,6 @@
       </nav>
 
       <div class="sidebar-foot">
-        <div class="mini-progress"><span><strong>11/14</strong> requisitos verificados</span><span>78,6 % ≈ 80 %</span><i><b></b></i></div>
         <button id="logout-button" class="ghost-button" type="button">Cerrar sesión</button>
       </div>
     </aside>
@@ -97,26 +97,10 @@
           <div class="cloud-illustration"><span>☁</span><small>Entorno demostrativo</small></div>
         </div>
         <div id="dashboard-stats" class="stats-grid"></div>
-        <div class="content-grid">
+        <div class="content-grid dashboard-content">
           <article class="panel">
             <div class="panel-head"><div><span class="eyebrow blue">Actividad reciente</span><h3>Últimos movimientos</h3></div></div>
             <ul id="activity-list" class="activity-list"></ul>
-          </article>
-          <article class="panel">
-            <div class="panel-head"><div><span class="eyebrow blue">Avance</span><h3>Cobertura verificada</h3></div><strong>11/14 · 78,6 % ≈ 80 %</strong></div>
-            <p class="progress-disclaimer"><strong>Cobertura actual:</strong> 11 de 14 requisitos implementados y verificados (78,6 %, aproximado al 80 %). Se incluyen los nueve requisitos funcionales, RNF-04 de respaldo/recuperación y RNF-05 de adaptabilidad/accesibilidad del prototipo.</p><ol class="requirement-list">
-              <li><b>RF-01</b><span>Autenticación institucional</span><em>Completo</em></li>
-              <li><b>RF-02</b><span>Roles y permisos</span><em>Completo</em></li>
-              <li><b>RF-03</b><span>Consulta académica</span><em>Completo</em></li>
-              <li><b>RF-04</b><span>Gestión de registros</span><em>Completo</em></li>
-              <li><b>RF-05</b><span>Repositorio documental</span><em>Completo</em></li>
-              <li><b>RF-06</b><span>Búsqueda y filtros</span><em>Completo</em></li>
-              <li><b>RF-07</b><span>Notificaciones internas</span><em>Completo</em></li>
-              <li><b>RF-08</b><span>Reportes y exportación CSV</span><em>Completo</em></li>
-              <li><b>RF-09</b><span>Bitácora de auditoría</span><em>Completo</em></li>
-              <li><b>RNF-04</b><span>Respaldo y recuperación local</span><em>Completo</em></li>
-              <li><b>RNF-05</b><span>Interfaz adaptable y accesibilidad</span><em>Completo</em></li>
-            </ol>
           </article>
         </div>
       </section>
@@ -136,6 +120,31 @@
         <article class="panel">
           <div class="panel-head"><div><span class="eyebrow blue">RF-03</span><h3>Asignaturas y calificaciones</h3></div><span class="muted">Solo se muestran registros del estudiante autenticado</span></div>
           <div class="table-wrap"><table><thead><tr><th>Código</th><th>Asignatura</th><th>Horario</th><th>Créditos</th><th>Nota</th><th>Estado</th></tr></thead><tbody id="academic-table"></tbody></table></div>
+        </article>
+      </section>
+
+
+      <section id="view-courses" class="view" hidden>
+        <div id="course-summary" class="stats-grid"></div>
+        <article class="panel">
+          <div class="panel-head">
+            <div><span class="eyebrow blue">Espacio académico</span><h3 id="courses-heading">Mis asignaturas</h3></div>
+            <span class="muted" id="courses-help"></span>
+          </div>
+          <div id="course-list" class="course-grid"></div>
+        </article>
+      </section>
+
+      <section id="view-assignments" class="view" hidden>
+        <div class="toolbar">
+          <label>Asignatura<select id="assignment-course-filter"><option value="all">Todas</option></select></label>
+          <label>Estado<select id="assignment-status-filter"><option value="all">Todos</option><option value="pending">Pendientes</option><option value="submitted">Entregados</option><option value="graded">Calificados</option></select></label>
+          <button id="new-assignment" class="primary-button compact" type="button">Crear actividad</button>
+        </div>
+        <div id="assignment-stats" class="stats-grid"></div>
+        <article class="panel">
+          <div class="panel-head"><div><span class="eyebrow blue">Trabajo académico</span><h3 id="assignments-heading">Actividades</h3></div><span id="assignment-count" class="counter"></span></div>
+          <div id="assignment-list" class="assignment-list"></div>
         </article>
       </section>
 
@@ -236,6 +245,43 @@
       </section>
     </main>
   </section>
+
+
+  <dialog id="assignment-dialog">
+    <form id="assignment-form" method="dialog" class="dialog-card">
+      <div class="dialog-head"><div><span class="eyebrow blue">Docencia</span><h2>Nueva actividad</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button></div>
+      <div class="form-grid">
+        <label class="wide">Título<input id="assignment-title" required maxlength="100" placeholder="Ej. Informe de patrones estructurales"></label>
+        <label>Asignatura<select id="assignment-course" required></select></label>
+        <label>Fecha límite<input id="assignment-due" type="date" required></label>
+        <label>Tipo<select id="assignment-type"><option>Tarea</option><option>Proyecto</option><option>Práctica</option><option>Evaluación</option></select></label>
+        <label>Puntaje<input id="assignment-points" type="number" min="1" max="100" value="100" required></label>
+        <label class="wide">Indicaciones<input id="assignment-description" maxlength="220" placeholder="Descripción e indicaciones para los estudiantes"></label>
+      </div>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Cancelar</button><button class="primary-button" value="default">Publicar actividad</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="submission-dialog">
+    <form id="submission-form" method="dialog" class="dialog-card">
+      <input id="submission-assignment-id" type="hidden">
+      <div class="dialog-head"><div><span class="eyebrow blue">Entrega</span><h2 id="submission-title">Entregar actividad</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button></div>
+      <label>Comentario para el docente<input id="submission-comment" maxlength="180" placeholder="Comentario opcional"></label>
+      <label>Archivo<input id="submission-file" type="file" accept=".pdf,.doc,.docx,.zip,.txt" required></label>
+      <p class="muted">En este prototipo se registra el nombre del archivo como evidencia de la entrega.</p>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Cancelar</button><button class="primary-button" value="default">Enviar entrega</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="grade-dialog">
+    <form id="grade-form" method="dialog" class="dialog-card">
+      <input id="grade-submission-id" type="hidden">
+      <div class="dialog-head"><div><span class="eyebrow blue">Evaluación</span><h2>Calificar entrega</h2></div><button class="icon-button" value="cancel" formnovalidate aria-label="Cerrar">×</button></div>
+      <label>Calificación<input id="grade-value" type="number" min="0" max="100" required></label>
+      <label>Retroalimentación<input id="grade-feedback" maxlength="220" placeholder="Observaciones para el estudiante"></label>
+      <div class="dialog-actions"><button class="secondary-button" value="cancel" formnovalidate>Cancelar</button><button class="primary-button" value="default">Guardar calificación</button></div>
+    </form>
+  </dialog>
 
   <dialog id="agenda-dialog">
     <form id="agenda-form" method="dialog" class="dialog-card">

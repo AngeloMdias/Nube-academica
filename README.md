@@ -1,4 +1,4 @@
-# Nube Académica — Prototipo funcional Ver. 4 (80 % de requisitos implementados)
+# Nube Académica — Prototipo funcional Ver. 5
 
 Proyecto Integrador II · grupo **GT2-GP13** · UNAN-León.
 
@@ -90,3 +90,27 @@ Sube a la raíz del repositorio `index.html`, `styles.css`, `logic.js`, `script.
 - **Aplicación:** 11/14 requisitos = **78,6 % ≈ 80 %**.
 - **Artículo:** **100 % de los apartados solicitados por la rúbrica redactados**.
 - **Enfoque de la Ver. 4:** mayor utilidad para estudiantes y docentes mediante agenda académica, seguimiento de actividades, documentos, avisos y continuidad de datos.
+
+
+## Mejoras de utilidad Ver. 5
+La interfaz principal ya no muestra bloques de porcentaje/cobertura de requisitos; esa información pertenece a la documentación del proyecto y no al producto final.
+
+### Estudiante
+- Mis asignaturas con horario, docente y próximas actividades.
+- Actividades con estado Pendiente, Entregado y Calificado.
+- Entrega de archivos (evidencia demostrativa por nombre de archivo).
+- Consulta de nota y retroalimentación del docente.
+- Notificaciones cuando se publica o califica una actividad.
+
+### Docente
+- Vista de asignaturas impartidas y cantidad de estudiantes.
+- Creación y publicación de actividades por asignatura.
+- Recepción de entregas de estudiantes.
+- Calificación y retroalimentación.
+- Notificación automática al estudiante al publicar la nota.
+
+### Flujo demostrable
+Docente publica actividad → estudiante recibe aviso → estudiante entrega → docente recibe la entrega → docente califica → estudiante recibe calificación y retroalimentación.
+
+## Interfaz y paleta
+Se mantiene la paleta azul marino, azul medio y cian de la versión anterior. Es coherente con un entorno académico/institucional, mantiene buen contraste y diferencia correctamente navegación, acciones y estados. Se priorizó mejorar la jerarquía y utilidad antes que cambiar una identidad visual que ya funcionaba.

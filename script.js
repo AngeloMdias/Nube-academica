@@ -79,7 +79,7 @@ const TITLES = {
   records: ["Administración", "Registros académicos"], documents: ["Recursos", "Repositorio documental"],
   search: ["RF-06", "Búsqueda integrada"], notifications: ["RF-07", "Notificaciones"],
   reports: ["RF-08", "Reportes académicos"], audit: ["RF-09", "Bitácora"],
-  users: ["Seguridad", "Usuarios y roles"], agenda: ["Organización", "Agenda académica"]
+  users: ["Seguridad", "Usuarios y roles"], agenda: ["Organización", "Agenda académica"], courses:["Aprendizaje","Mis asignaturas"], assignments:["Aprendizaje","Actividades y entregas"]
 };
 const ROLE_LABELS = { student: "Estudiante", teacher: "Docente", admin: "Administrador académico" };
 
@@ -88,6 +88,21 @@ if (localStorage.getItem("na_version") !== PROTOTYPE_VERSION) {
   localStorage.setItem("na_version", PROTOTYPE_VERSION);
 }
 
+
+const DEFAULT_COURSES = [
+  {id:"ISI-503", name:"Patrones de Diseño", teacherId:2, teacher:"María López", studentIds:[1,4], period:"2026-II", schedule:"Mar y Jue · 10:00", room:"Lab. 3"},
+  {id:"ISI-501", name:"Proyecto Integrador II", teacherId:2, teacher:"María López", studentIds:[1], period:"2026-II", schedule:"Vie · 13:00", room:"Aula 12"},
+  {id:"ISI-509", name:"Aplicaciones Web", teacherId:2, teacher:"María López", studentIds:[1,4], period:"2026-II", schedule:"Lun y Mié · 08:00", room:"Lab. 2"}
+];
+const DEFAULT_ASSIGNMENTS = [
+  {id:1001,courseId:"ISI-503",title:"Informe: Patrón Decorador",type:"Tarea",due:"2026-10-12",points:100,description:"Entregar informe breve con ejemplo aplicado.",publishedBy:2},
+  {id:1002,courseId:"ISI-501",title:"Avance del artículo científico",type:"Proyecto",due:"2026-10-15",points:100,description:"Revisar metodología, resultados, discusión y referencias.",publishedBy:2},
+  {id:1003,courseId:"ISI-509",title:"Práctica de interfaz responsive",type:"Práctica",due:"2026-10-18",points:100,description:"Construir una vista adaptable para móvil y escritorio.",publishedBy:2}
+];
+const DEFAULT_SUBMISSIONS = [
+  {id:2001,assignmentId:1001,studentId:4,fileName:"decorador_ana.pdf",comment:"Adjunto mi informe.",submittedAt:"08/10/2026 18:30",grade:null,feedback:""}
+];
+
 let currentUser = null;
 let users = loadData("na_users", DEMO_USERS);
 let records = loadData("na_records", DEFAULT_RECORDS);
@@ -95,6 +110,9 @@ let documents = loadData("na_documents", DEFAULT_DOCUMENTS);
 let notifications = loadData("na_notifications", DEFAULT_NOTIFICATIONS);
 let audit = loadData("na_audit", DEFAULT_AUDIT);
 let agenda = loadData("na_agenda", DEFAULT_AGENDA);
+let courses = loadData("na_courses", DEFAULT_COURSES);
+let assignments = loadData("na_assignments", DEFAULT_ASSIGNMENTS);
+let submissions = loadData("na_submissions", DEFAULT_SUBMISSIONS);
 
 function loadData(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) || structuredClone(fallback); }
@@ -158,6 +176,8 @@ function showView(view) {
   el("page-kicker").textContent = title[0]; el("page-title").textContent = title[1];
   if (view === "academic") { renderAcademic(); addAudit(currentUser.email, `Consulta académica ${el("period-filter").value}`); }
   if (view === "agenda") renderAgenda();
+  if (view === "courses") renderCourses();
+  if (view === "assignments") renderAssignments();
   if (view === "search") renderGlobalSearch();
   if (view === "notifications") renderNotifications();
   if (view === "reports") { renderReports(); addAudit(currentUser.email, "Consulta de reportes"); }
@@ -168,7 +188,7 @@ function renderAll() {
   renderDashboard();
   if (currentUser.role === "student") renderAcademic();
   if (currentUser.role === "admin") { renderRecords(); renderUsers(); renderReports(); renderAudit(); }
-  renderDocuments(); if (["student","teacher"].includes(currentUser.role)) renderAgenda(); renderGlobalSearch(); renderNotifications(); updateNotificationBadge();
+  renderDocuments(); if (["student","teacher"].includes(currentUser.role)) { renderAgenda(); renderCourses(); renderAssignments(); } renderGlobalSearch(); renderNotifications(); updateNotificationBadge();
 }
 
 function renderDashboard() {
@@ -176,13 +196,15 @@ function renderDashboard() {
   if (currentUser.role === "student") {
     const rows = U.filterAcademicByStudent(ACADEMIC_DATA, currentUser.id, "2026-II");
     const avg = rows.length ? (rows.reduce((s,r)=>s+r.grade,0)/rows.length).toFixed(1) : "—";
-    stats.push(["Promedio actual", avg, "Período 2026-II"], ["Asignaturas", rows.length, "Datos propios"], ["Documentos", documents.length, "Repositorio autorizado"], ["Avisos sin leer", unreadNotifications(), "RF-07"]);
-    el("welcome-title").textContent = "Tu información académica, en un solo lugar";
-    el("welcome-text").textContent = "Consulta tus datos separados por identidad, documentos y notificaciones.";
+    const myCourseIds=courses.filter(c=>c.studentIds.includes(currentUser.id)).map(c=>c.id); const pending=assignments.filter(a=>myCourseIds.includes(a.courseId)&&!submissions.some(s=>s.assignmentId===a.id&&s.studentId===currentUser.id)).length; const graded=submissions.filter(s=>s.studentId===currentUser.id&&s.grade!=null).length;
+    stats.push(["Promedio actual", avg, "Período 2026-II"], ["Asignaturas", myCourseIds.length, "Cursos activos"], ["Pendientes", pending, "Actividades por entregar"], ["Calificadas", graded, "Con retroalimentación"]);
+    el("welcome-title").textContent = "Tus clases, entregas y resultados en un solo lugar";
+    el("welcome-text").textContent = "Revisa asignaturas, entrega actividades, consulta calificaciones y mantente al día con tus fechas.";
   } else if (currentUser.role === "teacher") {
-    stats.push(["Documentos", documents.length, "Repositorio"], ["Avisos sin leer", unreadNotifications(), "RF-07"], ["Formatos", documents.filter(d=>d.category==="Formatos").length, "Disponibles"], ["Cobertura", "11/14", "78,6 % ≈ 80 %"]);
-    el("welcome-title").textContent = "Recursos académicos para el trabajo docente";
-    el("welcome-text").textContent = "Carga documentos autorizados, localízalos y revisa tus avisos.";
+    const myCourses=courses.filter(c=>c.teacherId===currentUser.id); const pendingReview=submissions.filter(s=>assignments.some(a=>a.id===s.assignmentId&&myCourses.some(c=>c.id===a.courseId))&&s.grade==null).length;
+    stats.push(["Mis asignaturas", myCourses.length, "Cursos activos"], ["Por revisar", pendingReview, "Entregas"], ["Actividades", assignments.filter(a=>myCourses.some(c=>c.id===a.courseId)).length, "Publicadas"], ["Avisos sin leer", unreadNotifications(), "Notificaciones"]);
+    el("welcome-title").textContent = "Organiza tus clases y acompaña a tus estudiantes";
+    el("welcome-text").textContent = "Publica actividades, revisa entregas, califica y comparte retroalimentación desde un mismo espacio.";
   } else {
     stats.push(["Registros", records.length, "Gestión académica"], ["Usuarios", users.length, "Control de roles"], ["Documentos", documents.length, "Repositorio"], ["Eventos", audit.length, "Bitácora"]);
     el("welcome-title").textContent = "Control académico con trazabilidad";
@@ -316,8 +338,98 @@ function renderAgenda() {
 }
 function saveAgenda(event){ if(event.submitter?.value==="cancel")return; event.preventDefault(); const item={id:Date.now(),ownerRole:currentUser.role,ownerUserId:currentUser.id,title:el("agenda-title").value.trim(),subject:el("agenda-subject").value.trim(),date:el("agenda-date").value,type:el("agenda-type").value,note:el("agenda-note").value.trim(),done:false}; if(!item.title||!item.subject||!item.date)return; agenda.push(item);saveData("na_agenda",agenda);addAudit(currentUser.email,`Creación de actividad: ${item.title}`);el("agenda-dialog").close();el("agenda-form").reset();renderAgenda();renderDashboard();showToast("Actividad agregada a tu agenda.");}
 function toggleAgenda(id){const a=agenda.find(x=>x.id===id);if(!a)return;a.done=!a.done;saveData("na_agenda",agenda);addAudit(currentUser.email,`${a.done?"Completó":"Reabrió"} actividad: ${a.title}`);renderAgenda();renderDashboard();}
-function exportBackup(){const payload={format:"NubeAcademicaBackup-v1",createdAt:new Date().toISOString(),users,records,documents,notifications,audit,agenda};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`nube-academica-respaldo-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);addAudit(currentUser.email,"Exportación de respaldo local");showToast("Respaldo exportado correctamente.");}
-async function importBackup(event){const file=event.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(data.format!=="NubeAcademicaBackup-v1"||![data.users,data.records,data.documents,data.notifications,data.audit,data.agenda].every(Array.isArray))throw new Error();users=data.users;records=data.records;documents=data.documents;notifications=data.notifications;audit=data.audit;agenda=data.agenda;saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda);addAudit(currentUser.email,"Restauración de respaldo local");renderAll();showToast("Respaldo restaurado y validado.");}catch{showToast("El archivo no es un respaldo válido de Nube Académica.");}finally{event.target.value="";}}
+function exportBackup(){const payload={format:"NubeAcademicaBackup-v1",createdAt:new Date().toISOString(),users,records,documents,notifications,audit,agenda,courses,assignments,submissions};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`nube-academica-respaldo-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);addAudit(currentUser.email,"Exportación de respaldo local");showToast("Respaldo exportado correctamente.");}
+async function importBackup(event){const file=event.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(data.format!=="NubeAcademicaBackup-v1"||![data.users,data.records,data.documents,data.notifications,data.audit,data.agenda,data.courses,data.assignments,data.submissions].every(Array.isArray))throw new Error();users=data.users;records=data.records;documents=data.documents;notifications=data.notifications;audit=data.audit;agenda=data.agenda;courses=data.courses;assignments=data.assignments;submissions=data.submissions;saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda);saveData("na_courses",courses);saveData("na_assignments",assignments);saveData("na_submissions",submissions);addAudit(currentUser.email,"Restauración de respaldo local");renderAll();showToast("Respaldo restaurado y validado.");}catch{showToast("El archivo no es un respaldo válido de Nube Académica.");}finally{event.target.value="";}}
+
+
+function myCourses(){ return currentUser.role==="teacher" ? courses.filter(c=>c.teacherId===currentUser.id) : courses.filter(c=>c.studentIds.includes(currentUser.id)); }
+function courseById(id){ return courses.find(c=>c.id===id); }
+function assignmentSubmission(aid, sid=currentUser.id){ return submissions.find(s=>s.assignmentId===aid&&s.studentId===sid); }
+function renderCourses(){
+  if(!currentUser||!["student","teacher"].includes(currentUser.role))return;
+  const rows=myCourses();
+  el("courses-heading").textContent=currentUser.role==="teacher"?"Asignaturas que impartes":"Asignaturas inscritas";
+  el("courses-help").textContent=currentUser.role==="teacher"?"Gestiona actividades y seguimiento por curso.":"Accede a actividades, fechas y resultados de cada curso.";
+  const activityCount=assignments.filter(a=>rows.some(c=>c.id===a.courseId)).length;
+  const people=currentUser.role==="teacher"?new Set(rows.flatMap(c=>c.studentIds)).size:rows.length;
+  el("course-summary").innerHTML=[
+    [currentUser.role==="teacher"?"Cursos":"Asignaturas",rows.length,"Período 2026-II"],
+    [currentUser.role==="teacher"?"Estudiantes":"Actividades",currentUser.role==="teacher"?people:activityCount,currentUser.role==="teacher"?"En tus cursos":"Publicadas"],
+    ["Próximas actividades",assignments.filter(a=>rows.some(c=>c.id===a.courseId)&&a.due>="2026-10-08").length,"Seguimiento"],
+    ["Avisos",unreadNotifications(),"Sin leer"]
+  ].map(s=>`<article class="stat-card"><span>${s[0]}</span><strong>${s[1]}</strong><small>${s[2]}</small></article>`).join("");
+  el("course-list").innerHTML=rows.map(c=>{
+    const acts=assignments.filter(a=>a.courseId===c.id);
+    const pending=currentUser.role==="student"?acts.filter(a=>!assignmentSubmission(a.id)).length:submissions.filter(s=>acts.some(a=>a.id===s.assignmentId)&&s.grade==null).length;
+    return `<article class="course-card"><div class="course-card-top"><div><span class="course-code">${escapeHtml(c.id)}</span><h4>${escapeHtml(c.name)}</h4></div><span class="badge">${escapeHtml(c.period)}</span></div><div class="course-meta"><span>${escapeHtml(c.schedule)}</span><span>•</span><span>${escapeHtml(c.room)}</span><span>•</span><span>${currentUser.role==="student"?escapeHtml(c.teacher):c.studentIds.length+" estudiantes"}</span></div><div class="course-actions"><button class="table-button" data-course-assignments="${c.id}">${acts.length} actividades</button><span class="muted">${pending} ${currentUser.role==="student"?"pendientes":"por revisar"}</span></div></article>`;
+  }).join("")||`<p class="muted">No hay asignaturas asociadas a esta cuenta.</p>`;
+}
+function assignmentStatus(a,studentId=currentUser.id){
+  const s=assignmentSubmission(a.id,studentId); if(!s)return ["Pendiente","status-pending"]; if(s.grade!=null)return ["Calificado","status-graded"]; return ["Entregado","status-submitted"];
+}
+function populateAssignmentCourses(){
+  const opts=myCourses().map(c=>`<option value="${c.id}">${escapeHtml(c.id)} · ${escapeHtml(c.name)}</option>`).join("");
+  el("assignment-course").innerHTML=opts;
+  const current=el("assignment-course-filter").value;
+  el("assignment-course-filter").innerHTML=`<option value="all">Todas</option>`+opts;
+  if([...el("assignment-course-filter").options].some(o=>o.value===current))el("assignment-course-filter").value=current;
+}
+function renderAssignments(){
+  if(!currentUser||!["student","teacher"].includes(currentUser.role))return;
+  populateAssignmentCourses();
+  el("new-assignment").hidden=currentUser.role!=="teacher";
+  el("assignments-heading").textContent=currentUser.role==="teacher"?"Actividades publicadas y entregas":"Mis actividades y entregas";
+  const ids=myCourses().map(c=>c.id), cf=el("assignment-course-filter").value, sf=el("assignment-status-filter").value;
+  let rows=assignments.filter(a=>ids.includes(a.courseId)&&(cf==="all"||a.courseId===cf));
+  if(currentUser.role==="student"&&sf!=="all") rows=rows.filter(a=>{const st=assignmentStatus(a)[0].toLowerCase();return st===(sf==="pending"?"pendiente":sf==="submitted"?"entregado":"calificado")});
+  if(currentUser.role==="teacher"&&sf!=="all") rows=rows.filter(a=>{const ss=submissions.filter(s=>s.assignmentId===a.id);return sf==="pending"?ss.length===0:sf==="submitted"?ss.some(s=>s.grade==null):ss.some(s=>s.grade!=null)});
+  rows.sort((a,b)=>a.due.localeCompare(b.due)); el("assignment-count").textContent=`${rows.length} actividades`;
+  const all=assignments.filter(a=>ids.includes(a.courseId)), mineSubs=submissions.filter(s=>currentUser.role==="student"?s.studentId===currentUser.id:all.some(a=>a.id===s.assignmentId));
+  const stats=currentUser.role==="student"?[
+    ["Pendientes",all.filter(a=>!assignmentSubmission(a.id)).length,"Por entregar"],
+    ["Entregadas",mineSubs.length,"Enviadas"],
+    ["Calificadas",mineSubs.filter(s=>s.grade!=null).length,"Con resultado"],
+    ["Próxima fecha",all.filter(a=>!assignmentSubmission(a.id)).sort((a,b)=>a.due.localeCompare(b.due))[0]?.due||"—","Agenda"]
+  ]:[
+    ["Publicadas",all.length,"Actividades"],
+    ["Entregas",mineSubs.length,"Recibidas"],
+    ["Por revisar",mineSubs.filter(s=>s.grade==null).length,"Pendientes"],
+    ["Calificadas",mineSubs.filter(s=>s.grade!=null).length,"Con feedback"]
+  ];
+  el("assignment-stats").innerHTML=stats.map(s=>`<article class="stat-card"><span>${s[0]}</span><strong>${s[1]}</strong><small>${s[2]}</small></article>`).join("");
+  el("assignment-list").innerHTML=rows.map(a=>{
+    const c=courseById(a.courseId);
+    if(currentUser.role==="student"){
+      const s=assignmentSubmission(a.id), st=assignmentStatus(a);
+      return `<article class="assignment-card"><div><span class="badge ${st[1]}">${st[0]}</span><h4>${escapeHtml(a.title)}</h4><p><strong>${escapeHtml(c?.name||a.courseId)}</strong> · ${escapeHtml(a.type)} · vence ${escapeHtml(a.due)} · ${a.points} pts</p><small>${escapeHtml(a.description)}</small>${s?`<div class="feedback-box"><strong>Entrega:</strong> ${escapeHtml(s.fileName)}${s.grade!=null?` · <strong>Nota: ${s.grade}/${a.points}</strong><br>${escapeHtml(s.feedback||"Sin observaciones adicionales.")}`:" · En espera de revisión"}</div>`:""}</div><div class="assignment-actions">${!s?`<button class="primary-button compact" data-submit-assignment="${a.id}">Entregar</button>`:`<span class="muted">${escapeHtml(s.submittedAt)}</span>`}</div></article>`;
+    }
+    const ss=submissions.filter(s=>s.assignmentId===a.id), pending=ss.filter(s=>s.grade==null);
+    const deliveryHtml=ss.length?ss.map(s=>{const u=users.find(x=>x.id===s.studentId);return `<div class="feedback-box"><strong>${escapeHtml(u?.name||"Estudiante")}</strong> · ${escapeHtml(s.fileName)} ${s.grade!=null?`· Nota ${s.grade}/${a.points}`:`<button class="table-button" data-grade-submission="${s.id}">Calificar</button>`}${s.feedback?`<br>${escapeHtml(s.feedback)}`:""}</div>`}).join(""):`<div class="feedback-box">Aún no hay entregas.</div>`;
+    return `<article class="assignment-card"><div><span class="badge">${escapeHtml(a.type)}</span><h4>${escapeHtml(a.title)}</h4><p><strong>${escapeHtml(c?.name||a.courseId)}</strong> · vence ${escapeHtml(a.due)} · ${a.points} pts</p><small>${escapeHtml(a.description)}</small>${deliveryHtml}</div><div class="assignment-actions"><span class="muted">${ss.length} entregas · ${pending.length} por revisar</span></div></article>`;
+  }).join("")||`<p class="muted">No hay actividades con estos filtros.</p>`;
+}
+function saveAssignment(e){
+  if(e.submitter?.value==="cancel")return;e.preventDefault();
+  const a={id:Date.now(),courseId:el("assignment-course").value,title:el("assignment-title").value.trim(),type:el("assignment-type").value,due:el("assignment-due").value,points:Number(el("assignment-points").value),description:el("assignment-description").value.trim(),publishedBy:currentUser.id};
+  if(!a.courseId||!a.title||!a.due)return; assignments.push(a);saveData("na_assignments",assignments);
+  const c=courseById(a.courseId); (c?.studentIds||[]).forEach(sid=>notifications.unshift({id:Date.now()+sid,eventKey:`assignment-${a.id}-${sid}`,recipientUserId:sid,subject:`Nueva actividad: ${a.title}`,body:`${c.name} · fecha límite ${a.due}`,date:nowLabel(),linkView:"assignments",read:false}));
+  saveData("na_notifications",notifications);addAudit(currentUser.email,`Publicó actividad ${a.title}`);el("assignment-dialog").close();el("assignment-form").reset();renderAssignments();renderDashboard();updateNotificationBadge();showToast("Actividad publicada para tus estudiantes.");
+}
+function openSubmission(aid){const a=assignments.find(x=>x.id===aid);if(!a)return;el("submission-assignment-id").value=aid;el("submission-title").textContent=a.title;el("submission-form").reset();el("submission-assignment-id").value=aid;el("submission-dialog").showModal();}
+function saveSubmission(e){
+  if(e.submitter?.value==="cancel")return;e.preventDefault();const aid=Number(el("submission-assignment-id").value),file=el("submission-file").files[0];if(!file)return;
+  if(assignmentSubmission(aid)){showToast("Ya existe una entrega para esta actividad.");return;}
+  const s={id:Date.now(),assignmentId:aid,studentId:currentUser.id,fileName:file.name,comment:el("submission-comment").value.trim(),submittedAt:nowLabel(),grade:null,feedback:""};submissions.push(s);saveData("na_submissions",submissions);
+  const a=assignments.find(x=>x.id===aid);notifications.unshift({id:Date.now()+1,eventKey:`submission-${s.id}`,recipientUserId:a.publishedBy,subject:`Nueva entrega: ${a.title}`,body:`${currentUser.name} realizó una entrega.`,date:nowLabel(),linkView:"assignments",read:false});saveData("na_notifications",notifications);
+  addAudit(currentUser.email,`Entregó actividad ${a.title}`);el("submission-dialog").close();renderAssignments();renderDashboard();showToast("Entrega registrada correctamente.");
+}
+function openGrade(sid){const s=submissions.find(x=>x.id===sid);if(!s)return;el("grade-form").reset();el("grade-submission-id").value=sid;el("grade-value").value=s.grade??"";el("grade-feedback").value=s.feedback||"";el("grade-dialog").showModal();}
+function saveGrade(e){
+  if(e.submitter?.value==="cancel")return;e.preventDefault();const s=submissions.find(x=>x.id===Number(el("grade-submission-id").value));if(!s)return;
+  s.grade=Number(el("grade-value").value);s.feedback=el("grade-feedback").value.trim();saveData("na_submissions",submissions);const a=assignments.find(x=>x.id===s.assignmentId);
+  notifications.unshift({id:Date.now(),eventKey:`grade-${s.id}-${s.grade}`,recipientUserId:s.studentId,subject:`Actividad calificada: ${a.title}`,body:`Tu calificación es ${s.grade}/${a.points}.`,date:nowLabel(),linkView:"assignments",read:false});saveData("na_notifications",notifications);
+  addAudit(currentUser.email,`Calificó actividad ${a.title}`);el("grade-dialog").close();renderAssignments();renderDashboard();updateNotificationBadge();showToast("Calificación y retroalimentación publicadas.");
+}
 
 function renderReports() {
   if (!currentUser || currentUser.role !== "admin") return;
@@ -349,8 +461,8 @@ function updateUser(id,key,value) { const u=users.find(x=>x.id===id); if(!u)retu
 
 async function resetDemo() {
   if(!confirm("¿Restablecer todos los datos de demostración?"))return;
-  users=structuredClone(DEMO_USERS); records=structuredClone(DEFAULT_RECORDS); documents=structuredClone(DEFAULT_DOCUMENTS); notifications=structuredClone(DEFAULT_NOTIFICATIONS); audit=structuredClone(DEFAULT_AUDIT); agenda=structuredClone(DEFAULT_AGENDA);
-  saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda); await clearBlobs().catch(()=>{});
+  users=structuredClone(DEMO_USERS); records=structuredClone(DEFAULT_RECORDS); documents=structuredClone(DEFAULT_DOCUMENTS); notifications=structuredClone(DEFAULT_NOTIFICATIONS); audit=structuredClone(DEFAULT_AUDIT); agenda=structuredClone(DEFAULT_AGENDA); courses=structuredClone(DEFAULT_COURSES); assignments=structuredClone(DEFAULT_ASSIGNMENTS); submissions=structuredClone(DEFAULT_SUBMISSIONS);
+  saveData("na_users",users);saveData("na_records",records);saveData("na_documents",documents);saveData("na_notifications",notifications);saveData("na_audit",audit);saveData("na_agenda",agenda);saveData("na_courses",courses);saveData("na_assignments",assignments);saveData("na_submissions",submissions); await clearBlobs().catch(()=>{});
   currentUser=users.find(u=>u.email===currentUser.email)||users[2]; configureSession(); showToast("Datos de demostración restablecidos.");
 }
 
@@ -363,6 +475,9 @@ document.addEventListener("click", event => {
   const read=event.target.closest("[data-notification-read]"); if(read) markNotification(Number(read.dataset.notificationRead));
   const open=event.target.closest("[data-notification-open]"); if(open){ markNotification(Number(open.dataset.notificationOpen)); showView(open.dataset.viewTarget); }
   const ag=event.target.closest("[data-agenda-toggle]"); if(ag) toggleAgenda(Number(ag.dataset.agendaToggle));
+  const ca=event.target.closest("[data-course-assignments]"); if(ca){showView("assignments");el("assignment-course-filter").value=ca.dataset.courseAssignments;renderAssignments();}
+  const sub=event.target.closest("[data-submit-assignment]"); if(sub) openSubmission(Number(sub.dataset.submitAssignment));
+  const grd=event.target.closest("[data-grade-submission]"); if(grd) openGrade(Number(grd.dataset.gradeSubmission));
 });
 
 el("login-form").addEventListener("submit", e=>{e.preventDefault();login(el("email").value,el("password").value);});
@@ -372,6 +487,7 @@ el("period-filter").addEventListener("change",()=>{renderAcademic();addAudit(cur
 el("record-search").addEventListener("input",renderRecords); el("record-period").addEventListener("change",renderRecords); el("new-record").addEventListener("click",()=>openRecord()); el("record-form").addEventListener("submit",saveRecord);
 el("document-search").addEventListener("input",renderDocuments); el("document-category").addEventListener("change",renderDocuments); el("upload-document").addEventListener("click",()=>{el("document-error").hidden=true;el("document-dialog").showModal();}); el("document-form").addEventListener("submit",saveDocument);
 el("global-search").addEventListener("input",renderGlobalSearch); el("global-type").addEventListener("change",renderGlobalSearch); el("global-period").addEventListener("change",renderGlobalSearch);
+el("assignment-course-filter").addEventListener("change",renderAssignments); el("assignment-status-filter").addEventListener("change",renderAssignments); el("new-assignment").addEventListener("click",()=>{populateAssignmentCourses();el("assignment-dialog").showModal();}); el("assignment-form").addEventListener("submit",saveAssignment); el("submission-form").addEventListener("submit",saveSubmission); el("grade-form").addEventListener("submit",saveGrade);
 el("agenda-filter").addEventListener("change",renderAgenda); el("new-agenda-item").addEventListener("click",()=>el("agenda-dialog").showModal()); el("agenda-form").addEventListener("submit",saveAgenda); el("backup-export").addEventListener("click",exportBackup); el("backup-import").addEventListener("change",importBackup);
 el("notification-filter").addEventListener("change",renderNotifications); el("mark-all-read").addEventListener("click",markAllNotifications);
 el("report-period").addEventListener("change",renderReports); el("export-report").addEventListener("click",exportReport);
